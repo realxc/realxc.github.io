@@ -1,7 +1,8 @@
 title: 浅谈JVM之垃圾回收
-author: John Doe
+author: Xiang Chuang
 date: 2019-04-08 16:54:02
 tags:
+categories: JVM
 ---
 ---
 title: 浅谈JVM之垃圾回收

@@ -95,3 +95,66 @@
 {"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":7976,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\video.js\u001b[39m","time":"2019-04-08T10:09:35.670Z","v":0}
 {"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":7976,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\merge.js\u001b[39m","time":"2019-04-08T10:09:35.676Z","v":0}
 {"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":7976,"level":20,"msg":"Database saved","time":"2019-04-08T10:09:35.685Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Writing database to D:\\MyGithub\\realxc.github.io/db.json","time":"2019-04-08T10:53:09.114Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Hexo version: 3.8.0","time":"2019-04-08T10:53:09.145Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Working directory: D:\\MyGithub\\realxc.github.io\\","time":"2019-04-08T10:53:09.145Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Config loaded: D:\\MyGithub\\realxc.github.io\\_config.yml","time":"2019-04-08T10:53:09.331Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-deployer-git","time":"2019-04-08T10:53:09.409Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-generator-archive","time":"2019-04-08T10:53:09.415Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-generator-category","time":"2019-04-08T10:53:09.419Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-generator-index","time":"2019-04-08T10:53:09.423Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-generator-tag","time":"2019-04-08T10:53:09.426Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-renderer-ejs","time":"2019-04-08T10:53:09.434Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-renderer-marked","time":"2019-04-08T10:53:09.446Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-renderer-stylus","time":"2019-04-08T10:53:09.447Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-server","time":"2019-04-08T10:53:09.569Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Plugin loaded: hexo-fs","time":"2019-04-08T10:53:09.703Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\filters\\exturl.js","time":"2019-04-08T10:53:09.712Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\helpers\\engine.js","time":"2019-04-08T10:53:09.713Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\helpers\\next-url.js","time":"2019-04-08T10:53:09.713Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\merge-configs.js","time":"2019-04-08T10:53:09.718Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\button.js","time":"2019-04-08T10:53:09.718Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\center-quote.js","time":"2019-04-08T10:53:09.718Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\exturl.js","time":"2019-04-08T10:53:09.720Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\full-image.js","time":"2019-04-08T10:53:09.720Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\include-raw.js","time":"2019-04-08T10:53:09.728Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\label.js","time":"2019-04-08T10:53:09.729Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\group-pictures.js","time":"2019-04-08T10:53:09.729Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\mermaid.js","time":"2019-04-08T10:53:09.730Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\pdf.js","time":"2019-04-08T10:53:09.731Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\note.js","time":"2019-04-08T10:53:09.731Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\tabs.js","time":"2019-04-08T10:53:09.732Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\tags\\video.js","time":"2019-04-08T10:53:09.732Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Script loaded: themes\\hexo-theme-next\\scripts\\merge.js","time":"2019-04-08T10:53:09.737Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":3768,"level":20,"msg":"Database saved","time":"2019-04-08T10:53:09.744Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Writing database to D:\\MyGithub\\realxc.github.io/db.json","time":"2019-04-08T13:23:56.749Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Hexo version: \u001b[35m3.8.0\u001b[39m","time":"2019-04-08T13:23:56.778Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Working directory: \u001b[35mD:\\MyGithub\\realxc.github.io\\\u001b[39m","time":"2019-04-08T13:23:56.779Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Config loaded: \u001b[35mD:\\MyGithub\\realxc.github.io\\_config.yml\u001b[39m","time":"2019-04-08T13:23:56.957Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-generator-archive\u001b[39m","time":"2019-04-08T13:23:56.993Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-generator-category\u001b[39m","time":"2019-04-08T13:23:56.997Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-generator-index\u001b[39m","time":"2019-04-08T13:23:57.001Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-generator-tag\u001b[39m","time":"2019-04-08T13:23:57.004Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-renderer-ejs\u001b[39m","time":"2019-04-08T13:23:57.010Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-renderer-marked\u001b[39m","time":"2019-04-08T13:23:57.022Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-renderer-stylus\u001b[39m","time":"2019-04-08T13:23:57.024Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-server\u001b[39m","time":"2019-04-08T13:23:57.139Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Plugin loaded: \u001b[35mhexo-fs\u001b[39m","time":"2019-04-08T13:23:57.258Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\filters\\exturl.js\u001b[39m","time":"2019-04-08T13:23:57.268Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\helpers\\engine.js\u001b[39m","time":"2019-04-08T13:23:57.269Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\helpers\\next-url.js\u001b[39m","time":"2019-04-08T13:23:57.270Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\merge-configs.js\u001b[39m","time":"2019-04-08T13:23:57.278Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\button.js\u001b[39m","time":"2019-04-08T13:23:57.279Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\center-quote.js\u001b[39m","time":"2019-04-08T13:23:57.281Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\exturl.js\u001b[39m","time":"2019-04-08T13:23:57.283Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\full-image.js\u001b[39m","time":"2019-04-08T13:23:57.284Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\group-pictures.js\u001b[39m","time":"2019-04-08T13:23:57.286Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\include-raw.js\u001b[39m","time":"2019-04-08T13:23:57.297Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\label.js\u001b[39m","time":"2019-04-08T13:23:57.299Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\mermaid.js\u001b[39m","time":"2019-04-08T13:23:57.299Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\pdf.js\u001b[39m","time":"2019-04-08T13:23:57.301Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\tabs.js\u001b[39m","time":"2019-04-08T13:23:57.302Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\note.js\u001b[39m","time":"2019-04-08T13:23:57.304Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\tags\\video.js\u001b[39m","time":"2019-04-08T13:23:57.305Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Script loaded: \u001b[35mthemes\\hexo-theme-next\\scripts\\merge.js\u001b[39m","time":"2019-04-08T13:23:57.312Z","v":0}
+{"name":"hexo","hostname":"DESKTOP-JHHG3ED","pid":10228,"level":20,"msg":"Database saved","time":"2019-04-08T13:23:57.319Z","v":0}

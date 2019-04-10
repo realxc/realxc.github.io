@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏） 现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉          3、青年代内存频繁回收（该原因是青年代内存分配">
+<meta name="keywords" content="java,内存泄漏,mat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存泄漏-案例分析">
+<meta property="og:url" content="http://realxc.githut.io/2018/07/09/内存泄漏案例分析/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏） 现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉          3、青年代内存频繁回收（该原因是青年代内存分配">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-2.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-3.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-4.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-5.png">
+<meta property="og:updated_time" content="2019-04-10T06:46:39.336Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内存泄漏-案例分析">
+<meta name="twitter:description" content="问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏） 现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉          3、青年代内存频繁回收（该原因是青年代内存分配">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-2.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://realxc.githut.io/2018/07/09/内存泄漏案例分析/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>内存泄漏-案例分析 | 博客园-向闯</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客园-向闯</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>日程表</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/09/内存泄漏案例分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">内存泄漏-案例分析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-09 14:24:00" itemprop="dateCreated datePublished" datetime="2018-07-09T14:24:00+08:00">2018-07-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-10 14:46:39" itemprop="dateModified" datetime="2019-04-10T14:46:39+08:00">2019-04-10</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏）</p>
+<p>现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上<br>          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉<br>          3、青年代内存频繁回收（该原因是青年代内存分配不合理，可考虑青年代占总堆内存3：8，但是不能太大，如果太                   大，当青年代回收时，如果需要晋升到老年代的对象占内容大于老年代可用空间的一般，将会导致Full GC）</p>
+<p>原因推测：<br>            上述现象第一反应是疑似出现内存泄漏<br>处理过程：1、系统挂掉（重启）前，dump内存镜像文件，  jmap -dump:format=b,file=盘符:/XXX.hprof <pid><br>                 2、使用mat工具分析dump文件<br>                 3、找出引起内存泄漏的对象<br>                 4、分析解决方案</pid></p>
+<p>附：<br>1、执行缓慢的代码日志：下面是一段for循环代码块，每次循环先校验再入库，逻辑简单，但发现异常的慢！<br>2018-07-04 08:39:06.511 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.539 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.596 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.613 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.673 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.696 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:39.615 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:39.618 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2、GC日志：老年代CMS策略垃圾回收日志，反复回收，但依旧回收不了内存，内存消耗的原来越多<br>2018-07-09T14:24:21.701+0800: 337412.009: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4302687K(5183936K)] 4971300K(6106880K), 0.0621324 secs] [Times: user=0.73 sys=0.00, real=0.07 secs]<br>2018-07-09T14:24:21.764+0800: 337412.072: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:22.900+0800: 337413.208: [GC (Allocation Failure) 337413.208: [ParNew: 760830K-&gt;17436K(922944K), 0.0174147 secs] 5063517K-&gt;4320664K(6106880K), 0.0180025 secs] [Times: user=0.11 sys=0.01, real=0.02 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-mark: 3.607/3.760 secs] [Times: user=16.27 sys=0.18, real=3.75 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-preclean: 0.045/0.047 secs] [Times: user=0.07 sys=0.01, real=0.05 secs]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:30.647+0800: 337420.955: [CMS-concurrent-abortable-preclean: 3.287/5.076 secs] [Times: user=4.95 sys=0.24, real=5.08 secs]<br>2018-07-09T14:24:30.658+0800: 337420.966: [GC (CMS Final Remark) [YG occupancy: 617178 K (922944 K)]337420.966: [Rescan (parallel) , 0.0603228 secs]337421.027: [weak refs processing, 0.0000841 secs]337421.027: [class unloading, 0.1254411 secs]337421.152: [scrub symbol table, 0.0445538 secs]337421.197: [scrub string table, 0.0066675 secs][1 CMS-remark: 4303227K(5183936K)] 4920406K(6106880K), 0.2439490 secs] [Times: user=0.90 sys=0.01, real=0.24 secs]<br>2018-07-09T14:24:30.903+0800: 337421.211: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:31.941+0800: 337422.249: [GC (Allocation Failure) 337422.249: [ParNew: 755804K-&gt;24447K(922944K), 0.0350291 secs] 5059025K-&gt;4328220K(6106880K), 0.0357587 secs] [Times: user=0.18 sys=0.00, real=0.04 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-sweep: 2.815/2.958 secs] [Times: user=4.72 sys=0.24, real=2.96 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:33.877+0800: 337424.185: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.886+0800: 337426.194: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4303632K(5183936K)] 4520863K(6106880K), 0.0222239 secs] [Times: user=0.21 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.910+0800: 337426.218: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-mark: 3.449/3.463 secs] [Times: user=14.73 sys=0.10, real=3.46 secs]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-preclean: 0.023/0.023 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:44.405+0800: 337434.713: [CMS-concurrent-abortable-preclean: 3.247/5.009 secs] [Times: user=3.97 sys=0.16, real=5.01 secs]<br>2018-07-09T14:24:44.415+0800: 337434.723: [GC (CMS Final Remark) [YG occupancy: 553150 K (922944 K)]337434.723: [Rescan (parallel) , 0.0524846 secs]337434.776: [weak refs processing, 0.0000721 secs]337434.776: [class unloading, 0.1203949 secs]337434.896: [scrub symbol table, 0.0454455 secs]337434.942: [scrub string table, 0.0063738 secs][1 CMS-remark: 4303632K(5183936K)] 4856783K(6106880K), 0.2322675 secs] [Times: user=0.83 sys=0.00, real=0.23 secs]<br>2018-07-09T14:24:44.648+0800: 337434.956: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-sweep: 2.492/2.501 secs] [Times: user=2.85 sys=0.03, real=2.50 secs]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:47.165+0800: 337437.473: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]<br>3、mat分析情况：</p>
+<p><img src="\images\pasted-2.png" alt="upload successful"></p>
+<p><img src="\images\pasted-3.png" alt="upload successful"></p>
+<p><img src="\images\pasted-4.png" alt="upload successful"></p>
+<p><img src="\images\pasted-5.png" alt="upload successful"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java/" rel="tag"># java</a>
+          
+            <a href="/tags/内存泄漏/" rel="tag"># 内存泄漏</a>
+          
+            <a href="/tags/mat/" rel="tag"># mat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/28/dubbo-反序列化问题/" rel="next" title="dubbo-反序列化问题">
+                <i class="fa fa-chevron-left"></i> dubbo-反序列化问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/12/druid-filter/" rel="prev" title="druid-filter">
+                druid-filter <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/realxc" title="GitHub &rarr; https://github.com/realxc" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="/709257360@qq.com@gmail.com" title="E-Mail &rarr; 709257360@qq.com@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+  
+  
+
+
+
+  
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/three/three.min.js"></script>
+
+  
+  <script src="/lib/three/three-waves.min.js"></script>
+
+  
+  <script src="/lib/three/canvas_lines.min.js"></script>
+
+  
+  <script src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
