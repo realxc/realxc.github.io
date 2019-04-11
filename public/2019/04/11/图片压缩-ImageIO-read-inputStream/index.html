@@ -96,20 +96,18 @@
 
 
 
-  <meta name="description" content="应用监控管理自定义健康检测器，实现org.springframework.boot.actuate.health.AbstractHealthIndicator充分利用java.lang.management.ManagementFactory，获取系统资源情况 易极付：基于spring-boot的应用健康监控：dubboHealthIndicator      dubbo健康检查deadlock">
-<meta name="keywords" content="spring,springboot,应用监控检查">
+  <meta name="description" content="背景：由于目前手机像素越来越富裕，导致用户上传图片时过大3-4M甚至以上，且像素较高，如3024*4032，因此，图片压缩功能就势在必行了。 选型：优先考虑前端压缩，但由于个人对前端无甚兴趣，因此提供了基于java的压缩解决方案。 目前市面上成熟的压缩工具大致为thumbnailator及simpleimage1、thumbnailator12345&amp;lt;dependency&amp;gt;		&amp;lt;">
+<meta name="keywords" content="图片压缩,ImageIO">
 <meta property="og:type" content="article">
-<meta property="og:title" content="springboot-spring-boot-starter-actuator">
-<meta property="og:url" content="http://realxc.githut.io/2018/07/12/springboot-spring-boot-starter-actuator/index.html">
+<meta property="og:title" content="图片压缩-ImageIO.read(inputStream)">
+<meta property="og:url" content="http://realxc.githut.io/2019/04/11/图片压缩-ImageIO-read-inputStream/index.html">
 <meta property="og:site_name" content="博客园-向闯">
-<meta property="og:description" content="应用监控管理自定义健康检测器，实现org.springframework.boot.actuate.health.AbstractHealthIndicator充分利用java.lang.management.ManagementFactory，获取系统资源情况 易极付：基于spring-boot的应用健康监控：dubboHealthIndicator      dubbo健康检查deadlock">
+<meta property="og:description" content="背景：由于目前手机像素越来越富裕，导致用户上传图片时过大3-4M甚至以上，且像素较高，如3024*4032，因此，图片压缩功能就势在必行了。 选型：优先考虑前端压缩，但由于个人对前端无甚兴趣，因此提供了基于java的压缩解决方案。 目前市面上成熟的压缩工具大致为thumbnailator及simpleimage1、thumbnailator12345&amp;lt;dependency&amp;gt;		&amp;lt;">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://realxc.githut.io/images/pasted-17.png">
-<meta property="og:updated_time" content="2019-04-10T07:44:39.674Z">
+<meta property="og:updated_time" content="2019-04-11T11:09:59.227Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="springboot-spring-boot-starter-actuator">
-<meta name="twitter:description" content="应用监控管理自定义健康检测器，实现org.springframework.boot.actuate.health.AbstractHealthIndicator充分利用java.lang.management.ManagementFactory，获取系统资源情况 易极付：基于spring-boot的应用健康监控：dubboHealthIndicator      dubbo健康检查deadlock">
-<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-17.png">
+<meta name="twitter:title" content="图片压缩-ImageIO.read(inputStream)">
+<meta name="twitter:description" content="背景：由于目前手机像素越来越富裕，导致用户上传图片时过大3-4M甚至以上，且像素较高，如3024*4032，因此，图片压缩功能就势在必行了。 选型：优先考虑前端压缩，但由于个人对前端无甚兴趣，因此提供了基于java的压缩解决方案。 目前市面上成熟的压缩工具大致为thumbnailator及simpleimage1、thumbnailator12345&amp;lt;dependency&amp;gt;		&amp;lt;">
 
 
 
@@ -117,7 +115,7 @@
 
   
   
-  <link rel="canonical" href="http://realxc.githut.io/2018/07/12/springboot-spring-boot-starter-actuator/">
+  <link rel="canonical" href="http://realxc.githut.io/2019/04/11/图片压缩-ImageIO-read-inputStream/">
 
 
 
@@ -127,7 +125,7 @@
   };
 </script>
 
-  <title>springboot-spring-boot-starter-actuator | 博客园-向闯</title>
+  <title>图片压缩-ImageIO.read(inputStream) | 博客园-向闯</title>
   
 
 
@@ -377,7 +375,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/12/springboot-spring-boot-starter-actuator/">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/11/图片压缩-ImageIO-read-inputStream/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xiang Chuang">
@@ -394,7 +392,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">springboot-spring-boot-starter-actuator
+          <h1 class="post-title" itemprop="name headline">图片压缩-ImageIO.read(inputStream)
 
               
             
@@ -420,24 +418,12 @@
                 
               
 
-              <time title="创建时间：2018-07-12 16:03:00" itemprop="dateCreated datePublished" datetime="2018-07-12T16:03:00+08:00">2018-07-12</time>
+              <time title="创建时间：2019-04-11 18:36:00 / 修改时间：19:09:59" itemprop="dateCreated datePublished" datetime="2019-04-11T18:36:00+08:00">2019-04-11</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 15:44:39" itemprop="dateModified" datetime="2019-04-10T15:44:39+08:00">2019-04-10</time>
               
             
           </span>
@@ -489,10 +475,19 @@
       
 
       
-        <p>应用监控管理<br>自定义健康检测器，实现org.springframework.boot.actuate.health.AbstractHealthIndicator<br>充分利用java.lang.management.ManagementFactory，获取系统资源情况</p>
-<p>易极付：<br>基于spring-boot的应用健康监控：<br>dubboHealthIndicator      dubbo健康检查<br>deadlockedThreadsHealthIndicator  死锁线程检查<br>threadsCountHealthIndicator 线程数量检查，阈值2000<br>systemLoadHealthIndicator cpu负载检查，阈值1/3<br>rabbitHealthIndicator rabbitmq可用性检查<br>sessionYedisHealthIndicator  sessionRedis可用性检查<br>tomcatHealthIndicator 线程占用数量 阈值1半，   tomcat默认最大线程400<br>yedisHealthIndicator redis可用性检查<br>diskSpaceHealthIndicator 硬盘空间检查 阈值management.health.diskspace.threshold=524288000<br>dataSourceHealthIndicator  使用select 1检查连接 （spring-boot提供）</p>
-<p><img src="\images\pasted-17.png" alt="upload successful"></p>
-
+        <p>背景：由于目前手机像素越来越富裕，导致用户上传图片时过大3-4M甚至以上，且像素较高，如3024*4032，因此，图片压缩功能就势在必行了。</p>
+<p>选型：优先考虑前端压缩，但由于个人对前端无甚兴趣，因此提供了基于java的压缩解决方案。</p>
+<p>目前市面上成熟的压缩工具大致为thumbnailator及simpleimage<br>1、thumbnailator<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">		&lt;groupId&gt;net.coobird&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;thumbnailator&lt;/artifactId&gt;</span><br><span class="line">		&lt;version&gt;0.4.8&lt;/version&gt;</span><br><span class="line"> &lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BufferedImage bufferedImage = Thumbnails.of(input).scale(scale).outputQuality(quality).asBufferedImage();</span><br></pre></td></tr></table></figure>
+<p>  经过使用发现有背景色变红的问题，未着手解决</p>
+<p>2、simpleimage<br>参加git<br><a href="https://github.com/alibaba/simpleimage" target="_blank" rel="noopener">https://github.com/alibaba/simpleimage</a></p>
+<p>由于simpleimage尝试过程中，存在识别不了图片类型的问题（本人操作系统为Win10），故未深究</p>
+<p>3、由于上述2个方案存在的问题及本身需求只是缩放图片而且，也用不上它们提供的水印之类的方法，因此，自定义了一个仅支持图片压缩能力的工具包<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public final static ByteArrayOutputStream scale(InputStream srcImageStream, float scale) throws IOException &#123;</span><br><span class="line">        ByteArrayOutputStream desImageStream = new ByteArrayOutputStream();</span><br><span class="line">        BufferedImage originalImage = ImageIO.read(srcImageStream);</span><br><span class="line">        int width = Float.valueOf(scale * originalImage.getWidth()).intValue();</span><br><span class="line">        int height = Float.valueOf(scale * originalImage.getHeight()).intValue();</span><br><span class="line">        BufferedImage newImage = new BufferedImage(width, height, originalImage.getType());</span><br><span class="line">        Graphics g = newImage.getGraphics();</span><br><span class="line">        g.drawImage(originalImage, 0, 0, width, height, null);</span><br><span class="line">        g.dispose();</span><br><span class="line">        ImageIO.write(newImage, &quot;jpeg&quot;, desImageStream);</span><br><span class="line">        return desImageStream;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>   该方案能在压缩质量得到保证的前提的快速完成压缩，约1s，thumbnailator使用时，约2s。<br>    问题来了：功能上去后，发现内存占用率偶尔超过90%，但垃圾回收后又能绝大数回收，（采用G1回收，只额外配置了暂停时间50ms，堆最大值1536M）因此排除内存泄漏的可能，但功能上去之前未曾出现，初步猜测是图片压缩功能引起的（方案1、3都存在问题，推测2也存在），后经本地java visualVM调试发现， 执行一个大小3M多，像素3024*4032的图片压缩时，会有35M多的老年代被直接使用。因此分析问题在于出现了大对象，大对象会直接分配在老年代，于是通过断点测试结合 java visualVM监控，定位到问题在于：<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BufferedImage originalImage = ImageIO.read(srcImageStream);</span><br></pre></td></tr></table></figure></p>
+<pre><code>此方法创建BufferedImage时，会基于ComponentSampleModel类首先创建数据缓冲区（dataBuffer），而缓冲区大小算法为：
+</code></pre>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">private int getBufferSize() &#123;</span><br><span class="line">      int maxBandOff=bandOffsets[0];//jpeg图片，此数组为&#123;2，1，0&#125;</span><br><span class="line">      for (int i=1; i&lt;bandOffsets.length; i++) &#123;</span><br><span class="line">          maxBandOff = Math.max(maxBandOff,bandOffsets[i]);</span><br><span class="line">      &#125;</span><br><span class="line">      if (maxBandOff &lt; 0 || maxBandOff &gt; (Integer.MAX_VALUE - 1)) &#123;</span><br><span class="line">          throw new IllegalArgumentException(&quot;Invalid band offset&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      if (pixelStride &lt; 0 || pixelStride &gt; (Integer.MAX_VALUE / width)) &#123;</span><br><span class="line">          throw new IllegalArgumentException(&quot;Invalid pixel stride&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      if (scanlineStride &lt; 0 || scanlineStride &gt; (Integer.MAX_VALUE / height)) &#123;</span><br><span class="line">          throw new IllegalArgumentException(&quot;Invalid scanline stride&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      int size = maxBandOff + 1;</span><br><span class="line">      int val = pixelStride * (width - 1);//pixelStride jpeg图片时，默认为3</span><br><span class="line">      if (val &gt; (Integer.MAX_VALUE - size)) &#123;</span><br><span class="line">          throw new IllegalArgumentException(&quot;Invalid pixel stride&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      size += val;</span><br><span class="line">      val = scanlineStride * (height - 1);//scanlineStride jpeg图片时，默认为12096</span><br><span class="line">      if (val &gt; (Integer.MAX_VALUE - size)) &#123;</span><br><span class="line">          throw new IllegalArgumentException(&quot;Invalid scan stride&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">      size += val;</span><br><span class="line">      return size;</span><br><span class="line">  &#125;</span><br><span class="line"> </span><br><span class="line"> 因此大小为(2+1)+3*(width-1)+12096*(height-1)  god，这是多大的一个内存呀</span><br><span class="line"> public DataBufferByte(int size, int numBanks) &#123;</span><br><span class="line">     super(STABLE, TYPE_BYTE, size, numBanks);</span><br><span class="line">     bankdata = new byte[numBanks][];</span><br><span class="line">     for (int i= 0; i &lt; numBanks; i++) &#123;</span><br><span class="line">         bankdata[i] = new byte[size];</span><br><span class="line">     &#125;</span><br><span class="line">     data = bankdata[0];</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<pre><code>如果整个逻辑处理时间是1s， 那么，可以算一下1s并发量多大，需要配置多大的内存了 ！！！
+</code></pre>
       
     </div>
 
@@ -515,11 +510,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/spring/" rel="tag"># spring</a>
+            <a href="/tags/图片压缩/" rel="tag"># 图片压缩</a>
           
-            <a href="/tags/springboot/" rel="tag"># springboot</a>
-          
-            <a href="/tags/应用监控检查/" rel="tag"># 应用监控检查</a>
+            <a href="/tags/ImageIO/" rel="tag"># ImageIO</a>
           
         </div>
       
@@ -532,8 +525,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/07/12/druid-filter/" rel="next" title="druid-filter">
-                <i class="fa fa-chevron-left"></i> druid-filter
+              <a href="/2019/04/10/G1-Evacuation-Failure/" rel="next" title="G1-Evacuation Failure">
+                <i class="fa fa-chevron-left"></i> G1-Evacuation Failure
               </a>
             
           </div>
@@ -541,10 +534,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/07/17/应用停机-优雅停机问题/" rel="prev" title="应用停机-优雅停机问题">
-                应用停机-优雅停机问题 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
