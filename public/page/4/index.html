@@ -371,7 +371,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/linux-tail命令不生效/">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-默认jdk版本/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xiang Chuang">
@@ -391,7 +391,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2017/07/20/linux-tail命令不生效/" class="post-title-link" itemprop="url">linux-tail命令不生效</a>
+                <a href="/2017/07/20/maven-默认jdk版本/" class="post-title-link" itemprop="url">maven-默认jdk版本</a>
               
             
           </h1>
@@ -487,9 +487,10 @@
       
         
           
-            <p>tail: option used in invalid context – 1</p>
-<p>遇到此类命令使用不合法的警告时，可以which tail或者whereis tail 看看命令是否被使用了别名</p>
-
+            <p>修改maven默认的jdk版本，想改彻底需要在maven的全局配文件（settings.xml）增加以下信息：</p>
+<p>在profiles 节点下增加：</p>
+<p><img src="\images\pasted-55.png" alt="upload successful"></p>
+<profile><br>    <id>jdk-1.6</id><br>    <activation><br>        <activebydefault>true</activebydefault><br>        <jdk>1.6</jdk><br>    </activation><br>    <properties><br>        &lt;maven.compiler.source&gt;1.6&lt;/maven.compiler.source&gt;<br>        &lt;maven.compiler.target&gt;1.6&lt;/maven.compiler.target&gt;<br>        &lt;maven.compiler.compilerVersion&gt;1.6&lt;/maven.compiler.compilerVersion&gt;<br>    </properties><br></profile> 
           
         
       
@@ -545,7 +546,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/struts2-no-action-in-maven/">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/mysql-TIMESTAMP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xiang Chuang">
@@ -565,7 +566,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2017/07/20/struts2-no-action-in-maven/" class="post-title-link" itemprop="url">struts2-no action in maven</a>
+                <a href="/2017/07/20/mysql-TIMESTAMP/" class="post-title-link" itemprop="url">mysql -TIMESTAMP</a>
               
             
           </h1>
@@ -661,8 +662,8 @@
       
         
           
-            <p>原因：convention插件默认不扫描jar中的action<br> 解决方案：<a href="http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)" target="_blank" rel="noopener">http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)</a><br>    <!-- the jar URL can contain a path to the jar file and a trailing "!/" --><br>    <constant name="struts.convention.action.includeJars" value=".*?/Imanage\w*.*?jar(!/)?">  匹配 前缀为Imanage的所有jar</constant></p>
-<p><img src="\images\pasted-56.png" alt="upload successful"></p>
+            <p>The TIMESTAMP data type is used for values that contain both date and time parts. TIMESTAMP has a range of ‘1970-01-01 00:00:01’ UTC to ‘2038-01-19 03:14:07’ UTCThe TIMESTAMP data type is used for values that contain both date and time parts. TIMESTAMP has a range of ‘1970-01-01 00:00:01’ UTC to ‘2038-01-19 03:14:07’ UTC</p>
+<p>UTC+8: 2038-01-19 11:14:07</p>
 
           
         

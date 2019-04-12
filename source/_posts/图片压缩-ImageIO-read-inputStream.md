@@ -7,6 +7,9 @@ categories:
   - 爱学爱问
 date: 2019-04-11 18:36:00
 ---
+本文可结合链接中的文章从GC层面辅助分析！
+https://realxc.github.io/2019/04/09/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8-xx-initiatingheapoccupancypercent%E5%8F%98%E9%87%8F%E4%B9%8B%E9%97%AE/
+
 背景：由于目前手机像素越来越富裕，导致用户上传图片时过大3-4M甚至以上，且像素较高，如3024*4032，因此，图片压缩功能就势在必行了。
 
 选型：优先考虑前端压缩，但由于个人对前端无甚兴趣，因此提供了基于java的压缩解决方案。
@@ -23,13 +26,113 @@ date: 2019-04-11 18:36:00
   ```
   BufferedImage bufferedImage = Thumbnails.of(input).scale(scale).outputQuality(quality).asBufferedImage();
   ```
-  经过使用发现有背景色变红的问题，未着手解决
+  经过使用发现有背景色变红的问题，未着手解决,同时，内存消耗较大
   
 2、simpleimage
-参加git
+参见git
 https://github.com/alibaba/simpleimage
+```
+<dependency>
+			<groupId>com.sun.media</groupId>
+			<artifactId>jai-codec</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.media</groupId>
+			<artifactId>jai-core</artifactId>
+			<version>1.1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>simpleimage</artifactId>
+			<version>1.2.3</version>
+</dependency>            
+```
+```
+File in = new File("d://04092.jpg");      //原图片
+            ImageWrapper imageWrapper = ImageReadHelper.read(new FileInputStream(in));
+            int witdh = imageWrapper.getWidth();
+            int height = imageWrapper.getHeight();
+            File out = new File("d://04092-after.jpg");       //目的图片
+            ScaleParameter scaleParam = new ScaleParameter(Float.valueOf(witdh * 0.5f).intValue()
+                    , Float.valueOf(height * 0.5f).intValue());
+            WriteParameter writeParam = new WriteParameter();
 
-由于simpleimage尝试过程中，存在识别不了图片类型的问题（本人操作系统为Win10），故未深究
+            FileInputStream inStream = null;
+            FileOutputStream outStream = null;
+            ImageRender wr = null;
+            inStream = new FileInputStream(in);
+            outStream = new FileOutputStream(out);
+            ImageRender rr = new ReadRender(inStream);
+            ImageRender sr = new ScaleRender(rr, scaleParam);
+            wr = new WriteRender(sr, outStream, ImageFormat.JPEG, writeParam);
+
+            wr.render();                            //触发图像处理
+```
+```
+WriteRender.render()源码：
+ @Override
+    public ImageWrapper render() throws SimpleImageException {
+        try {
+            if (image == null) {
+                image = imageRender.render();//此处读取原文件，大对象
+            }
+
+            ImageWriteHelper.write(image, stream, outputFormat, param);//写文件，数据缓冲区分段初始化，一个按压缩后图片像素大小生产，外加若干512*512及1024*1024的缓冲区，因此需要更多的内存
+        } catch (Exception e) {
+            throw new SimpleImageException(e);
+        }
+
+        return null;
+    }
+```
+```
+ReadRender.render源码， WriteRender中需要首先依赖此类读取原文件
+@Override
+    public ImageWrapper render() throws SimpleImageException {
+        try {
+            ImageWrapper imgWrapper;
+            if (inStream == null) {
+                throw new SimpleImageException("No input set");
+            }
+
+            imgWrapper = ImageReadHelper.read(inStream);
+
+            if (tosRGBColorSpace) {
+                for (int i = 0; i < imgWrapper.getNumOfImages(); i++) {
+                    PlanarImage img = ImageColorConvertHelper.convert2sRGB(imgWrapper
+                            .getAsPlanarImage(i));
+                    imgWrapper.setImage(i, img);
+                }
+            }
+
+            return imgWrapper;
+        } catch (Exception e) {
+            throw new SimpleImageException(e);
+        }
+    }
+    
+    ImageReadHelper.read(inStream)：
+    public static ImageWrapper read(InputStream input)
+            throws SimpleImageException {
+        try {
+            input = ImageUtils.createMemoryStream(input);//流拷贝，增加了内存使用
+
+            if (ImageUtils.isJPEG(input)) {
+                return readJPEG(input);//此处耗内存
+            }
+
+            if (ImageUtils.isGIF(input)) {
+                return readGIF(input);
+            }
+
+            return readGeneral(input);
+        } catch (Exception e) {
+            throw new SimpleImageException(e);
+        }
+    }
+```
+由于simpleimage在read及write阶段做了额外操作，使得单次开辟的大对象比方案1的小，但，多次开辟缓冲区，总内存大小反而需要的更多，结合G1内存分配机制，在内存方面与方案1存在相同问题。
 
 3、由于上述2个方案存在的问题及本身需求只是缩放图片而且，也用不上它们提供的水印之类的方法，因此，自定义了一个仅支持图片压缩能力的工具包
 ```
@@ -92,4 +195,23 @@ public final static ByteArrayOutputStream scale(InputStream srcImageStream, floa
     }
     
     ```
-    如果整个逻辑处理时间是1s， 那么，可以算一下1s并发量多大，需要配置多大的内存了 ！！！
+
+如果整个逻辑处理时间是1s， 那么，可以算一下1s并发量多大，需要配置多大的内存了 ！！！
+
+附：测试数据
+方案1：
+![upload successful](\images\pasted-62.png)
+![upload successful](\images\pasted-63.png)
+![upload successful](\images\pasted-64.png)
+
+方案2：
+![upload successful](\images\pasted-68.png)
+![upload successful](\images\pasted-69.png)
+![upload successful](\images\pasted-70.png)
+![upload successful](\images\pasted-71.png)
+![upload successful](\images\pasted-72.png)
+![upload successful](\images\pasted-73.png)
+方案3：
+![upload successful](\images\pasted-65.png)
+![upload successful](\images\pasted-66.png)
+![upload successful](\images\pasted-67.png)
