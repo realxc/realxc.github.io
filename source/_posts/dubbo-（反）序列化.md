@@ -4,7 +4,7 @@ tags:
   - dubbo
   - 序列化
 categories:
-  - 爱学爱问
+  - 这些年，那些坑
 date: 2018-06-12 18:24:00
 ---
 dubbo枚举（反）序列化使用的是：com.alibaba.com.caucho.hessian.io.EnumDeserializer

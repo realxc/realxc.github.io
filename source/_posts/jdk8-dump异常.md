@@ -1,11 +1,11 @@
 title: jdk8-dump异常
 author: Xiang Chuang
 tags:
+  - java
   - jdk8
   - dump
-  - java
 categories:
-  - 爱学爱问
+  - 这些年，那些坑
 date: 2018-09-10 10:36:00
 ---
 ![upload successful](\images\pasted-1.png)

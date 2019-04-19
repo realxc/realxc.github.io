@@ -3,7 +3,7 @@ author: Xiang Chuang
 tags:
   - zookeeper
 categories:
-  - 爱学爱问
+  - 这些年，那些坑
 date: 2018-09-10 18:09:00
 ---
 现象，zk后台日志发现频繁刷如下日志

@@ -1,11 +1,11 @@
 title: mongo-查询报no property found on
 author: Xiang Chuang
 tags:
-  - mongo
   - db
+  - mongo
 categories:
-  - 爱学爱问
-date: 2018-12-07 15:11:20
+  - 这些年，那些坑
+date: 2018-12-07 15:11:00
 ---
 No property null found on entity com.yiji.dtrace.core.SpanId to bind constructor parameter to!
 
