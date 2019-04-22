@@ -81,6 +81,12 @@ date: 2019-04-08 16:54:00
 
 ## 垃圾回收
  
+&emsp;&emsp;再谈对象创建之内存分配
+&emsp;&emsp;这是一个及其重要的环节，且，根据垃圾回收机制的不同而有所差别，在聊垃圾回收之前，我想有必要就这点多说几句。
+&emsp;&emsp;##对象优先分配在Eden区域，即年轻代
+&emsp;&emsp;##大对象直接分配在老年代，需要说明的是何为大对象，不同收集器定义的不一样，Serial及ParNew收集器采用参数-XX:PretenureSizeThreshold指定，G1则默认为大于区域region大小一半的对象
+&emsp;&emsp;##长期存活的对象进入老年代，一般默认为熬过15次年轻代回收的对象，该值可以调整，具体参数名根据收集器的约定而定。另外，如果Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于等于该年龄的对象直接进入老年代（针对Serial及ParNew）
+&emsp;&emsp;##空间分配担保：只要老年代的连续空间大于新生代对象总大小或历次晋升的平局大小则进行MinorGC，否则进行Full GC（针对Serial及ParNew）
 &emsp;&emsp;前面大概聊了一下虚拟机内存区域以及java对象本身的那点事，这是一个java开发者必备的基础知识，因为你不仅仅应该知道Object obj = new Object（），你更应该清楚java对象究竟是如何诞生的，JVM在这里面做了什么，另一方面，你还应该清楚JVM又是如何替我们清理那些不再被引用的对象。
 &emsp;&emsp;首先，我们来简单聊聊垃圾收集算法：
 &emsp;&emsp;标记-清除（Mark-Sweep）算法：顾名思义，它包含两步，一是标记需要回收的对象，二是清除被标记的对象。但有两个明显的问题是，标记和清除两个环节效率都不高，其次，直接清除会导致内存碎片，这将导致大对象无法找到足够大小的连续空间来分配，从而提前下一次GC。
@@ -91,6 +97,22 @@ date: 2019-04-08 16:54:00
 &emsp;&emsp;##进行对象可达性分析时，要考虑一致性问题，因为对象的引用随着应用线程的运行不停的变更着，因此需要STW，由于STW对应用线程影响很大，各种垃圾回收器中对此做了通盘的考虑，但即使如CMS这种号称不会STW的收集器也无法避免枚举根节点时的GC停顿。另外，HotSpot设计了基于OopMap的数据结构来记录对象的引用以提升效率。
 &emsp;&emsp;安全点：为指令生产OopMap需要大量额外的空间，因此，HotSpot设计中并没为每条指令生成OopMap，只是在一些成为安全点的特定位置记录这些信息，即，只有当线程进入到安全点时才能暂停下来开始GC。安全点的选定是有讲究的，不可过多也不可过少，所以基本考虑在长时间执行的部分设置安全点，如方法调用、循环跳转、异常跳转等。对于线程在安全点如何停下来的问题，有两种手段，一是抢先式中断、二是主动式中断。HotSpot选择后者，即，GC设置中断标识，用户线程主动轮询是否需要中断，轮询标志的地方和安全点重合。
 &emsp;&emsp;安全区域：对于某些暂时未分配到CUP时间的线程，如其处于Sleep或Blocked状态，JVM不可能瞎等其得到CPU时间后跑到安全点，因此提供了安全区域解决该问题。安全区域中，引用关系不会发生变化，线程进去安全区域时会标识自己已进入，离开时，需要判断系统是否已经完成了根节点枚举或者整个GC过程，没有完成时需等待接收可以离开的信号。
+&emsp;&emsp;接下来我们来聊聊HotSpot定义的垃圾回收器，这是一个重要的话题，也是日常开发中我们最直接面对的课题，先上一个总图（这里代表的是jdk11之前的垃圾回收器，因为在jdk11中，oracle推出了号称很强大很强大的ZGC，支持TB级的内存回收及单次GC暂停时间低于10ms，目前未使用到该版本的jdk，也尚未对此回收器做研究）
+![upload successful](\images\pasted-80.png)
+&emsp;&emsp;##Serial收集器：单线程收集器，进行垃圾回收时需暂停其他所有线程，直到收集结束。比较老的收集器了，适用于Client模式的应用。采用复制算法
+![upload successful](\images\pasted-82.png)
+&emsp;&emsp;##ParNew收集器：Serial的多线程版本，默认开启的收集线程数与CPU的数量相同，可通过参数-XX:ParallelGCThreads控制。采用复制算法
+![upload successful](\images\pasted-84.png)
+&emsp;&emsp;##Serial Old收集器：其可作为Serial、ParNew及Parallel Scavenge的老年代收集器，同时，当CMS收集发生Concurrent Model Failure时，会使用Serail Old进行Full GC。采用标记-整理算法
+![upload successful](\images\pasted-82.png)
+&emsp;&emsp;##Parallel Scavenge收集器：更加关注吞吐量，即追求最大吞吐量，适用于那些需要大量计算的应用。使用参数-XX:MaxGCPauseMillis控制停顿时间，参数-XX:GCTimeRatio控制吞吐量（如默认99，即1/（1+99）为GC占CPU时间），开关参数-XX:UseAdaptiveSizePolicy打开后即开启了GC自适应调节策略，无需指定年轻代大小、Survivor大小或晋升老年代对象大小。采用复制算法
+![upload successful](\images\pasted-85.png)
+&emsp;&emsp;##Parallel Old收集器：于jdk1.6开始提供，作为Parallel Scavenge的老年代收集器。采用标记-整理算法
+![upload successful](\images\pasted-85.png)
+&emsp;&emsp;##CMS收集器：更加关注暂停时间，即追求最短暂停时间。采用标记-清除算法
+![upload successful](\images\pasted-86.png)
+&emsp;&emsp;##G1收集器：在暂停时间于吞吐量中权衡。整体来看采用标记-整理算法，局部（region之间）来看采用了复制算法。
+![upload successful](\images\pasted-87.png)
 
 
 ----------------------------------

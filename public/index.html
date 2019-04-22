@@ -561,6 +561,170 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/10/G1-Humongous-Allocation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/04/10/G1-Humongous-Allocation/" class="post-title-link" itemprop="url">G1-Humongous Allocation</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-10 11:56:00 / 修改时间：14:27:33" itemprop="dateCreated datePublished" datetime="2019-04-10T11:56:00+08:00">2019-04-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>它是由’G1 Humongous Allocation’造成的。大型对象（Humongous ）是大于G1中region大小50％的对象。频繁大型对象分配会导致性能问题。如果region里面包含大量的大型对象，则该region中最后一个具有巨型对象的区域与区域末端之间的空间将不会使用。如果有多个这样的大型对象，这个未使用的空间可能导致堆碎片化。直到jdk1.8u40之前，这些巨型对象的回收只在full GC期间完成。在较新的JVM中，对这些对象的清理放在了清理阶段。</p>
+<p>解决方案：</p>
+<p>①.可以加大region的大小，设置-XX:G1HeapRegionSize=n，但是这个参数需要设置为2的幂次方，最小值是1M，最大值是32M。</p>
+<p>②.如果可以的话增加JVM堆大小（即-Xmx -Xms）。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/10/G1-Evacuation-Failure/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -674,170 +838,6 @@
 <p>③.如果您无法增加堆大小，并且您注意到marking cycle没有足够早地开始回收老一代，那么请减少-XX：InitiatingHeapOccupancyPercent。默认值是45％。减小该值将提前开始marking cycle 。另一方面，如果marking cycle 提前开始并且未收回，请将-XX：InitiatingHeapOccupancyPercent阈值增加到默认值以上。</p>
 <p>④.如果并发marking cycle准时开始，但需要很长时间才能完成，那么使用属性’-XX：ConcGCThreads’增加并发标记线程数的数量。默认是GC Workers: 1 ，单线程执行。</p>
 <p>⑤.如果有大量“空间耗尽（to-space exhausted）”或“空间溢出（to-space overflow）”GC事件，则增加-XX:G1ReservePercent。默认值是Java堆的10％。注意：G1 GC将此值限制在50％以内。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/10/G1-Humongous-Allocation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/10/G1-Humongous-Allocation/" class="post-title-link" itemprop="url">G1-Humongous Allocation</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-10 11:56:00 / 修改时间：14:27:33" itemprop="dateCreated datePublished" datetime="2019-04-10T11:56:00+08:00">2019-04-10</time>
-            
-
-            
-              
-
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>它是由’G1 Humongous Allocation’造成的。大型对象（Humongous ）是大于G1中region大小50％的对象。频繁大型对象分配会导致性能问题。如果region里面包含大量的大型对象，则该region中最后一个具有巨型对象的区域与区域末端之间的空间将不会使用。如果有多个这样的大型对象，这个未使用的空间可能导致堆碎片化。直到jdk1.8u40之前，这些巨型对象的回收只在full GC期间完成。在较新的JVM中，对这些对象的清理放在了清理阶段。</p>
-<p>解决方案：</p>
-<p>①.可以加大region的大小，设置-XX:G1HeapRegionSize=n，但是这个参数需要设置为2的幂次方，最小值是1M，最大值是32M。</p>
-<p>②.如果可以的话增加JVM堆大小（即-Xmx -Xms）。</p>
 
           
         
@@ -1270,7 +1270,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-20 15:15:23" itemprop="dateModified" datetime="2019-04-20T15:15:23+08:00">2019-04-20</time>
+                <time title="修改时间：2019-04-22 22:27:04" itemprop="dateModified" datetime="2019-04-22T22:27:04+08:00">2019-04-22</time>
               
             
           </span>
@@ -1336,7 +1336,7 @@
 <hr>
 <h2 id="java对象"><a href="#java对象" class="headerlink" title="java对象"></a>java对象</h2><p>&emsp;&emsp;前面聊完java对象身存的载体的具体结构，下面我们聊一聊java对象本身的一些事，需要说明的的是，此处是基于HotSpot探讨java对象在堆空间上实例的创建、布局以及访问。<br>1、对象的创建<br>&emsp;&emsp;从语言层面来讲，java对象的创建就是一个new关键字，当应用运行时，虚拟机遇到一条new指令，将进行如下操作：<br>&emsp;&emsp;##检查类的加载：检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化。<br>&emsp;&emsp;##分配内存：java堆内存是否规整决定了如何分配内存，规整的内存，采用“指针碰撞”（Bump the Pointer），即从已用内存和空闲内存的指针分界点开始向空闲内存移动与对象大小相等的距离即可；如何内存不规整，则需要维护空闲列表（Free List），分配时从列表中选择足够大的空间划分给对象的实例。java堆是否规整与垃圾采集器是否带有压缩整理功能有关，如使用Serial、ParNew这种带Compact过程的收集器时采用指针碰撞，使用CMS这种基于Mark-Sweep算法的收集器时采用空闲列表。另外一个需要考虑的问题是线程安全，解决这个问题有两种方案，1是采用CAS保证原子性；2是为每个线程在java堆中预先分配一小块，即本地线程分配缓冲（TLAB），只需在分配新的TLAB时进行同步锁定，-XX：+/-UseTLAB。<br>&emsp;&emsp;##初始化为0值：此处不包括对象头，这个操作保证了对象的实例可以不赋初始值即可使用。<br>&emsp;&emsp;##对象头信息设置：对象头中包含如，这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄、锁等信息。<br>&emsp;&emsp;##初始化（执行<init>方法）：一般来说，执行new指令之后会接着执行<init>方法（由字节码中是否跟随invokespecial指令决定），从而，一个真正可以使用的对象诞生。<br>2、对象的内存布局<br>&emsp;&emsp;HotSpot中，对象在内存中存储的布局分为3部分：对象头（Header）、实例数据（Instance Data）以及对齐填充（Padding）。<br>&emsp;&emsp;##对象头：对象头包含两部分，1是用于存储对象自身的运行时数据Mark Work，在32位和64位的虚拟机中分别占32bit、64bit,包含信息如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向锁线程ID、偏向时间戳等。eg：32位未锁定状态的对象，25bit用于存储对象哈希码、4bit用于存储对象分代年龄、2bit用于存储锁标识位，1bit固定为0；2是类型指针，即对象指向它的类元数据的指针；对于数组来说，对象头还需有一块用于记录数组长度的数据从而确定数组的大小。<br>&emsp;&emsp;##实例数据：HotSpot默认的分配策略为longs/doubles、ints、shorts/chars、bytes/boolean、oops（Oddinary Pointers），相同宽度的字段被分配在一起，父类定义的变量位于子类变量之前（如果CompactFields=true，子类较窄的变量也可能插入到父类变量的空隙中）。<br>&emsp;&emsp;##对齐填充：HotSpot要求对象起始地址必须是8字节的整数倍，对象头正好符合，因此对象实例数据可用对齐填充来补全。<br>3、对象的访问定位<br>&emsp;&emsp;java程序需要通过栈上的reference数据来操作堆上的具体对象。<br>&emsp;&emsp;##使用句柄访问：reference中存储的是对象的句柄地址，句柄中包含了对象实例数据与类型数据各自的具体地址，此方式，java堆划分出特定的内存作为句柄池。对象的定位需要两次指针定位，1次找到句柄、另1次找到具体的对象，好处则在于垃圾回收后，对象并移动，不用更改reference中的地址，只需更改句柄池中对应的地址。<br>&emsp;&emsp;##使用直接指针访问：reference中存储的是对象地址。对象的定位一次就能找到，提升了性能，HotSpot采用此方案。<br>4、对象的存活<br>&emsp;&emsp;前一部分提到，java程序通过栈上的reference数据操作堆上的对象，被操作的对象称之为被引用。对象是否存活与其是否尚被引用有关，那么我们首先来谈一谈引用。<br>&emsp;&emsp;引用可分为强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）。<br>&emsp;&emsp;##强引用：类似于赋值语句那种，垃圾回收器不会回收被引用对象<br>&emsp;&emsp;##软引用：jdk提供了SoftReference类实现软引用，指一些有用但并非必须的对象，系统OOM之前会回收此类对象<br>&emsp;&emsp;##弱引用：jdk提供了WeakReference类实现弱引用，下一次GC时回收此类对象<br>&emsp;&emsp;##虚引用：jdk提供了PhantomReference类实现虚引用，也称之为幽灵引用，对象是否存在虚引用对其本身无任何影响，且无法通过虚引用获得一个对象实例，因此，为对象设置一个虚引用的唯一目的是该对象被回收时收到一个系统通知<br>&emsp;&emsp;下面来谈谈判断对象是否存活的两类算法：<br>&emsp;&emsp;引用计数算法：给对象添加一个引用计算器，值为0时代表对象可回收，但，对于循环依赖来说，这似乎是个问题<br>&emsp;&emsp;可达性分析算法：以一系列被称为GC Roots的对象（虚拟机栈即栈帧中本地变量表中引用的对象；方法区中类静态属性引用的对象；方法区中常量引用的对象；本地方法栈中JNI引用的对象）为起点进行搜索，判断对象是否有引用链到达GC Roots，如果没有，代表对象可回收。<br>&emsp;&emsp;需要说明的是，利用可达性分析出不可达的对象，并不一定会立即回收，因为进行标记时会做一次筛选（条件是对象是否有必要执行finalize(),如果对象没有覆盖此方法或此方法被执行过一次，则不必要，否则会把此类对象放入一个F-Queue队列中由虚拟机自建一个低优先级的Finalizer线程去执行，为了避免执行缓慢，其并不会等待执行结果）。  </init></init></p>
 <hr>
-<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>&emsp;&emsp;前面大概聊了一下虚拟机内存区域以及java对象本身的那点事，这是一个java开发者必备的基础知识，因为你不仅仅应该知道Object obj = new Object（），你更应该清楚java对象究竟是如何诞生的，JVM在这里面做了什么，另一方面，你还应该清楚JVM又是如何替我们清理那些不再被引用的对象。<br>&emsp;&emsp;首先，我们来简单聊聊垃圾收集算法：<br>&emsp;&emsp;标记-清除（Mark-Sweep）算法：顾名思义，它包含两步，一是标记需要回收的对象，二是清除被标记的对象。但有两个明显的问题是，标记和清除两个环节效率都不高，其次，直接清除会导致内存碎片，这将导致大对象无法找到足够大小的连续空间来分配，从而提前下一次GC。<br>&emsp;&emsp;复制（Copying）算法：将内存划分为几块，当一块内存用完后，把存活的对象移动至另一块，再把当前块已使用的空间一性清理掉。但这会导致预留的那部分空间分配时不能用。如HotSpot实现为，将内存分为Eden和两个Survivor，Eden：Survivro为8：1，即预留了10%的空间。需要指出的是，如果对象生命周期长，那么预留的空间也许会出现不够用，这时便需要其他内存进行分配担保（Handle Promotion），这里指的是老年代内存。因为需要额外的空间做担保，那么此算法不适合老年代回收。<br>&emsp;&emsp;标记-整理（Mark-Compact）算法：完成标记后，让所有存活的对象向一端移动，然后直接清理掉端边界之外的内存。<br>&emsp;&emsp;最后要说明的是，当前的商业虚拟机采用分代收集，即区分新生代和老年代，根据其不同特点搭配不通的垃圾收集算法，如年轻代使用复制算法，老年代使用标记-清除算法或标记-整理算法。<br>&emsp;&emsp;HotSpot实现垃圾回收简介：<br>&emsp;&emsp;##进行对象可达性分析时，要考虑一致性问题，因为对象的引用随着应用线程的运行不停的变更着，因此需要STW，由于STW对应用线程影响很大，各种垃圾回收器中对此做了通盘的考虑，但即使如CMS这种号称不会STW的收集器也无法避免枚举根节点时的GC停顿。另外，HotSpot设计了基于OopMap的数据结构来记录对象的引用以提升效率。<br>&emsp;&emsp;安全点：为指令生产OopMap需要大量额外的空间，因此，HotSpot设计中并没为每条指令生成OopMap，只是在一些成为安全点的特定位置记录这些信息，即，只有当线程进入到安全点时才能暂停下来开始GC。安全点的选定是有讲究的，不可过多也不可过少，所以基本考虑在长时间执行的部分设置安全点，如方法调用、循环跳转、异常跳转等。对于线程在安全点如何停下来的问题，有两种手段，一是抢先式中断、二是主动式中断。HotSpot选择后者，即，GC设置中断标识，用户线程主动轮询是否需要中断，轮询标志的地方和安全点重合。<br>&emsp;&emsp;安全区域：对于某些暂时未分配到CUP时间的线程，如其处于Sleep或Blocked状态，JVM不可能瞎等其得到CPU时间后跑到安全点，因此提供了安全区域解决该问题。安全区域中，引用关系不会发生变化，线程进去安全区域时会标识自己已进入，离开时，需要判断系统是否已经完成了根节点枚举或者整个GC过程，没有完成时需等待接收可以离开的信号。</p>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>&emsp;&emsp;再谈对象创建之内存分配<br>&emsp;&emsp;这是一个及其重要的环节，且，根据垃圾回收机制的不同而有所差别，在聊垃圾回收之前，我想有必要就这点多说几句。<br>&emsp;&emsp;##对象优先分配在Eden区域，即年轻代<br>&emsp;&emsp;##大对象直接分配在老年代，需要说明的是何为大对象，不同收集器定义的不一样，Serial及ParNew收集器采用参数-XX:PretenureSizeThreshold指定，G1则默认为大于区域region大小一半的对象<br>&emsp;&emsp;##长期存活的对象进入老年代，一般默认为熬过15次年轻代回收的对象，该值可以调整，具体参数名根据收集器的约定而定。另外，如果Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于等于该年龄的对象直接进入老年代（针对Serial及ParNew）<br>&emsp;&emsp;##空间分配担保：只要老年代的连续空间大于新生代对象总大小或历次晋升的平局大小则进行MinorGC，否则进行Full GC（针对Serial及ParNew）<br>&emsp;&emsp;前面大概聊了一下虚拟机内存区域以及java对象本身的那点事，这是一个java开发者必备的基础知识，因为你不仅仅应该知道Object obj = new Object（），你更应该清楚java对象究竟是如何诞生的，JVM在这里面做了什么，另一方面，你还应该清楚JVM又是如何替我们清理那些不再被引用的对象。<br>&emsp;&emsp;首先，我们来简单聊聊垃圾收集算法：<br>&emsp;&emsp;标记-清除（Mark-Sweep）算法：顾名思义，它包含两步，一是标记需要回收的对象，二是清除被标记的对象。但有两个明显的问题是，标记和清除两个环节效率都不高，其次，直接清除会导致内存碎片，这将导致大对象无法找到足够大小的连续空间来分配，从而提前下一次GC。<br>&emsp;&emsp;复制（Copying）算法：将内存划分为几块，当一块内存用完后，把存活的对象移动至另一块，再把当前块已使用的空间一性清理掉。但这会导致预留的那部分空间分配时不能用。如HotSpot实现为，将内存分为Eden和两个Survivor，Eden：Survivro为8：1，即预留了10%的空间。需要指出的是，如果对象生命周期长，那么预留的空间也许会出现不够用，这时便需要其他内存进行分配担保（Handle Promotion），这里指的是老年代内存。因为需要额外的空间做担保，那么此算法不适合老年代回收。<br>&emsp;&emsp;标记-整理（Mark-Compact）算法：完成标记后，让所有存活的对象向一端移动，然后直接清理掉端边界之外的内存。<br>&emsp;&emsp;最后要说明的是，当前的商业虚拟机采用分代收集，即区分新生代和老年代，根据其不同特点搭配不通的垃圾收集算法，如年轻代使用复制算法，老年代使用标记-清除算法或标记-整理算法。<br>&emsp;&emsp;HotSpot实现垃圾回收简介：<br>&emsp;&emsp;##进行对象可达性分析时，要考虑一致性问题，因为对象的引用随着应用线程的运行不停的变更着，因此需要STW，由于STW对应用线程影响很大，各种垃圾回收器中对此做了通盘的考虑，但即使如CMS这种号称不会STW的收集器也无法避免枚举根节点时的GC停顿。另外，HotSpot设计了基于OopMap的数据结构来记录对象的引用以提升效率。<br>&emsp;&emsp;安全点：为指令生产OopMap需要大量额外的空间，因此，HotSpot设计中并没为每条指令生成OopMap，只是在一些成为安全点的特定位置记录这些信息，即，只有当线程进入到安全点时才能暂停下来开始GC。安全点的选定是有讲究的，不可过多也不可过少，所以基本考虑在长时间执行的部分设置安全点，如方法调用、循环跳转、异常跳转等。对于线程在安全点如何停下来的问题，有两种手段，一是抢先式中断、二是主动式中断。HotSpot选择后者，即，GC设置中断标识，用户线程主动轮询是否需要中断，轮询标志的地方和安全点重合。<br>&emsp;&emsp;安全区域：对于某些暂时未分配到CUP时间的线程，如其处于Sleep或Blocked状态，JVM不可能瞎等其得到CPU时间后跑到安全点，因此提供了安全区域解决该问题。安全区域中，引用关系不会发生变化，线程进去安全区域时会标识自己已进入，离开时，需要判断系统是否已经完成了根节点枚举或者整个GC过程，没有完成时需等待接收可以离开的信号。<br>&emsp;&emsp;接下来我们来聊聊HotSpot定义的垃圾回收器，这是一个重要的话题，也是日常开发中我们最直接面对的课题，先上一个总图（这里代表的是jdk11之前的垃圾回收器，因为在jdk11中，oracle推出了号称很强大很强大的ZGC，支持TB级的内存回收及单次GC暂停时间低于10ms，目前未使用到该版本的jdk，也尚未对此回收器做研究）<br><img src="\images\pasted-80.png" alt="upload successful"><br>&emsp;&emsp;##Serial收集器：单线程收集器，进行垃圾回收时需暂停其他所有线程，直到收集结束。比较老的收集器了，适用于Client模式的应用。采用复制算法<br><img src="\images\pasted-82.png" alt="upload successful"><br>&emsp;&emsp;##ParNew收集器：Serial的多线程版本，默认开启的收集线程数与CPU的数量相同，可通过参数-XX:ParallelGCThreads控制。采用复制算法<br><img src="\images\pasted-84.png" alt="upload successful"><br>&emsp;&emsp;##Serial Old收集器：其可作为Serial、ParNew及Parallel Scavenge的老年代收集器，同时，当CMS收集发生Concurrent Model Failure时，会使用Serail Old进行Full GC。采用标记-整理算法<br><img src="\images\pasted-82.png" alt="upload successful"><br>&emsp;&emsp;##Parallel Scavenge收集器：更加关注吞吐量，即追求最大吞吐量，适用于那些需要大量计算的应用。使用参数-XX:MaxGCPauseMillis控制停顿时间，参数-XX:GCTimeRatio控制吞吐量（如默认99，即1/（1+99）为GC占CPU时间），开关参数-XX:UseAdaptiveSizePolicy打开后即开启了GC自适应调节策略，无需指定年轻代大小、Survivor大小或晋升老年代对象大小。采用复制算法<br><img src="\images\pasted-85.png" alt="upload successful"><br>&emsp;&emsp;##Parallel Old收集器：于jdk1.6开始提供，作为Parallel Scavenge的老年代收集器。采用标记-整理算法<br><img src="\images\pasted-85.png" alt="upload successful"><br>&emsp;&emsp;##CMS收集器：更加关注暂停时间，即追求最短暂停时间。采用标记-清除算法<br><img src="\images\pasted-86.png" alt="upload successful"><br>&emsp;&emsp;##G1收集器：在暂停时间于吞吐量中权衡。整体来看采用标记-整理算法，局部（region之间）来看采用了复制算法。<br><img src="\images\pasted-87.png" alt="upload successful"></p>
 <hr>
 <h2 id="内存调优"><a href="#内存调优" class="headerlink" title="内存调优"></a>内存调优</h2><p>高性能的垃圾回收</p>
 
