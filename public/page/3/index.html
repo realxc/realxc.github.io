@@ -371,6 +371,535 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/12/druid-filter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/07/12/druid-filter/" class="post-title-link" itemprop="url">druid-filter</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-12 14:02:00" itemprop="dateCreated datePublished" datetime="2018-07-12T14:02:00+08:00">2018-07-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-10 15:07:14" itemprop="dateModified" datetime="2019-04-10T15:07:14+08:00">2019-04-10</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>com.alibaba.druid.filter.Filter<br>过滤器，对数据库操作做切面代理</p>
+<p>org.apache.ibatis.session.SqlSession<br>org.mybatis.spring.SqlSessionTemplate#sqlSessionProxy<br>com.alibaba.druid.proxy.jdbc.ConnectionProxyImpl@3fadc0bd(DataSourceUtils.getConnection(this.dataSource);)<br>com.alibaba.druid.pool.DruidPooledPreparedStatement（createChain().preparedStatement_execute(this);）<br>com.alibaba.druid.filter.FilterEventAdapter<br>com.yiji.common.ds.druid.YijiStatFilter（易极付实现）</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/09/内存泄漏案例分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/07/09/内存泄漏案例分析/" class="post-title-link" itemprop="url">内存泄漏-案例分析</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-09 14:24:00" itemprop="dateCreated datePublished" datetime="2018-07-09T14:24:00+08:00">2018-07-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏）</p>
+<p>现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上<br>          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉<br>          3、青年代内存频繁回收（该原因是青年代内存分配不合理，可考虑青年代占总堆内存3：8，但是不能太大，如果太                   大，当青年代回收时，如果需要晋升到老年代的对象占内容大于老年代可用空间的一般，将会导致Full GC）</p>
+<p>原因推测：<br>            上述现象第一反应是疑似出现内存泄漏<br>处理过程：1、系统挂掉（重启）前，dump内存镜像文件，  jmap -dump:format=b,file=盘符:/XXX.hprof <pid><br>                 2、使用mat工具分析dump文件<br>                 3、找出引起内存泄漏的对象<br>                 4、分析解决方案</pid></p>
+<p>附：<br>1、执行缓慢的代码日志：下面是一段for循环代码块，每次循环先校验再入库，逻辑简单，但发现异常的慢！<br>2018-07-04 08:39:06.511 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.539 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.596 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.613 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.673 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.696 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:39.615 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:39.618 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2、GC日志：老年代CMS策略垃圾回收日志，反复回收，但依旧回收不了内存，内存消耗的原来越多<br>2018-07-09T14:24:21.701+0800: 337412.009: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4302687K(5183936K)] 4971300K(6106880K), 0.0621324 secs] [Times: user=0.73 sys=0.00, real=0.07 secs]<br>2018-07-09T14:24:21.764+0800: 337412.072: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:22.900+0800: 337413.208: [GC (Allocation Failure) 337413.208: [ParNew: 760830K-&gt;17436K(922944K), 0.0174147 secs] 5063517K-&gt;4320664K(6106880K), 0.0180025 secs] [Times: user=0.11 sys=0.01, real=0.02 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-mark: 3.607/3.760 secs] [Times: user=16.27 sys=0.18, real=3.75 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-preclean: 0.045/0.047 secs] [Times: user=0.07 sys=0.01, real=0.05 secs]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:30.647+0800: 337420.955: [CMS-concurrent-abortable-preclean: 3.287/5.076 secs] [Times: user=4.95 sys=0.24, real=5.08 secs]<br>2018-07-09T14:24:30.658+0800: 337420.966: [GC (CMS Final Remark) [YG occupancy: 617178 K (922944 K)]337420.966: [Rescan (parallel) , 0.0603228 secs]337421.027: [weak refs processing, 0.0000841 secs]337421.027: [class unloading, 0.1254411 secs]337421.152: [scrub symbol table, 0.0445538 secs]337421.197: [scrub string table, 0.0066675 secs][1 CMS-remark: 4303227K(5183936K)] 4920406K(6106880K), 0.2439490 secs] [Times: user=0.90 sys=0.01, real=0.24 secs]<br>2018-07-09T14:24:30.903+0800: 337421.211: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:31.941+0800: 337422.249: [GC (Allocation Failure) 337422.249: [ParNew: 755804K-&gt;24447K(922944K), 0.0350291 secs] 5059025K-&gt;4328220K(6106880K), 0.0357587 secs] [Times: user=0.18 sys=0.00, real=0.04 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-sweep: 2.815/2.958 secs] [Times: user=4.72 sys=0.24, real=2.96 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:33.877+0800: 337424.185: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.886+0800: 337426.194: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4303632K(5183936K)] 4520863K(6106880K), 0.0222239 secs] [Times: user=0.21 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.910+0800: 337426.218: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-mark: 3.449/3.463 secs] [Times: user=14.73 sys=0.10, real=3.46 secs]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-preclean: 0.023/0.023 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:44.405+0800: 337434.713: [CMS-concurrent-abortable-preclean: 3.247/5.009 secs] [Times: user=3.97 sys=0.16, real=5.01 secs]<br>2018-07-09T14:24:44.415+0800: 337434.723: [GC (CMS Final Remark) [YG occupancy: 553150 K (922944 K)]337434.723: [Rescan (parallel) , 0.0524846 secs]337434.776: [weak refs processing, 0.0000721 secs]337434.776: [class unloading, 0.1203949 secs]337434.896: [scrub symbol table, 0.0454455 secs]337434.942: [scrub string table, 0.0063738 secs][1 CMS-remark: 4303632K(5183936K)] 4856783K(6106880K), 0.2322675 secs] [Times: user=0.83 sys=0.00, real=0.23 secs]<br>2018-07-09T14:24:44.648+0800: 337434.956: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-sweep: 2.492/2.501 secs] [Times: user=2.85 sys=0.03, real=2.50 secs]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:47.165+0800: 337437.473: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]<br>3、mat分析情况：</p>
+<p><img src="\images\pasted-2.png" alt="upload successful"></p>
+<p><img src="\images\pasted-3.png" alt="upload successful"></p>
+<p><img src="\images\pasted-4.png" alt="upload successful"></p>
+<p><img src="\images\pasted-5.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/06/28/dubbo-反序列化问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/06/28/dubbo-反序列化问题/" class="post-title-link" itemprop="url">dubbo-反序列化问题</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-28 12:14:00" itemprop="dateCreated datePublished" datetime="2018-06-28T12:14:00+08:00">2018-06-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>问题：网银充值，支付引擎调用清算调用网关，网关响应清算，清算响应支付引擎（支付引擎解析时出现反序列化异常）</p>
+<p>原因分析：清算配置了yiji.dubbo.provider.serialization=hessian3，即传输时使用hessian3序列化、反序列化<br>，但是支付引擎使用的hessian2.  使用hessian2反序列化hessian3序列化出了问题</p>
+<p>但是清算反序列化网关为什么没有问题，  3反序列化2做了兼容？还是说，本身就是用的2反序列化2.  如果时2反序列化2，那么即使支付引擎配置成3，那岂不又成了2反序列化3？   所以应该是兼容吧！！！！</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/06/12/dubbo-（反）序列化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -433,7 +962,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-10 15:08:48" itemprop="dateModified" datetime="2019-04-10T15:08:48+08:00">2019-04-10</time>
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
               
             
           </span>
@@ -450,7 +979,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
 
                 
                 
@@ -899,7 +1428,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-Plugin-execution-not-covered-by-lifecycle-configuration/">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-No-plugin-found-for-prefix-tomcat7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xiang Chuang">
@@ -919,7 +1448,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2017/07/20/maven-Plugin-execution-not-covered-by-lifecycle-configuration/" class="post-title-link" itemprop="url">maven-Plugin execution not covered by lifecycle configuration</a>
+                <a href="/2017/07/20/maven-No-plugin-found-for-prefix-tomcat7/" class="post-title-link" itemprop="url">maven-No plugin found for prefix 'tomcat7'</a>
               
             
           </h1>
@@ -1015,9 +1544,8 @@
       
         
           
-            <p>description:Project build lifecycle mapping can be configured in a project’s pom.xml, contributed by Eclipse plugins, or defaulted to the commonly used Maven plugins shipped with m2e. We call these “lifecycle mapping metadata sources”. m2e will create error marker like below for all plugin executions that do not have lifecycle mapping in any of the mapping metadata sources.</p>
-<p>M2Eclipse matches plugin executions to actions using combination of plugin groupId, artifactId, version range and goal. There are three basic actions that M2Eclipse can be instructed to do with a plugin execution – ignore, execute and delegate to a project configurator(recommended).</p>
-
+            <p>没有tomcat7插件<br>解决：在parent中</p>
+ <plugin><br>         <groupid>org.apache.tomcat.maven</groupid><br>         <artifactid>tomcat7-maven-plugin</artifactid><br>         <version>2.2</version><br>         <configuration><br>             <port>8091</port><br>             <uriencoding>UTF-8</uriencoding><br>             <path>/</path><br>         </configuration><br>       </plugin>
           
         
       
@@ -1246,6 +1774,180 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-Plugin-execution-not-covered-by-lifecycle-configuration/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2017/07/20/maven-Plugin-execution-not-covered-by-lifecycle-configuration/" class="post-title-link" itemprop="url">maven-Plugin execution not covered by lifecycle configuration</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>description:Project build lifecycle mapping can be configured in a project’s pom.xml, contributed by Eclipse plugins, or defaulted to the commonly used Maven plugins shipped with m2e. We call these “lifecycle mapping metadata sources”. m2e will create error marker like below for all plugin executions that do not have lifecycle mapping in any of the mapping metadata sources.</p>
+<p>M2Eclipse matches plugin executions to actions using combination of plugin groupId, artifactId, version range and goal. There are three basic actions that M2Eclipse can be instructed to do with a plugin execution – ignore, execute and delegate to a project configurator(recommended).</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/淘宝架构-进化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1408,703 +2110,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-No-plugin-found-for-prefix-tomcat7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/maven-No-plugin-found-for-prefix-tomcat7/" class="post-title-link" itemprop="url">maven-No plugin found for prefix 'tomcat7'</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>没有tomcat7插件<br>解决：在parent中</p>
- <plugin><br>         <groupid>org.apache.tomcat.maven</groupid><br>         <artifactid>tomcat7-maven-plugin</artifactid><br>         <version>2.2</version><br>         <configuration><br>             <port>8091</port><br>             <uriencoding>UTF-8</uriencoding><br>             <path>/</path><br>         </configuration><br>       </plugin>
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/struts2-no-action-in-maven/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/struts2-no-action-in-maven/" class="post-title-link" itemprop="url">struts2-no action in maven</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>原因：convention插件默认不扫描jar中的action<br> 解决方案：<a href="http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)" target="_blank" rel="noopener">http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)</a><br>    <!-- the jar URL can contain a path to the jar file and a trailing "!/" --><br>    <constant name="struts.convention.action.includeJars" value=".*?/Imanage\w*.*?jar(!/)?">  匹配 前缀为Imanage的所有jar</constant></p>
-<p><img src="\images\pasted-56.png" alt="upload successful"></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/linux-tail命令不生效/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/linux-tail命令不生效/" class="post-title-link" itemprop="url">linux-tail命令不生效</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>tail: option used in invalid context – 1</p>
-<p>遇到此类命令使用不合法的警告时，可以which tail或者whereis tail 看看命令是否被使用了别名</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/maven-Failed-to-execute-goal-org-apache-maven-plugins-maven-enforcer-plugin/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/maven-Failed-to-execute-goal-org-apache-maven-plugins-maven-enforcer-plugin/" class="post-title-link" itemprop="url">maven-Failed to execute goal org.apache.maven.plugins:maven-enforcer-plugin:</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>maven带的强制或者自定义得强制，导致打包不过。</p>
-<p>info：</p>
-<p>util:jar:2.2.20150520<br>Found Banned Dependency: org.slf4j:slf4j-log4j12:jar:1.7.10<br>Use ‘mvn dependency:tree’ to locate the source of the banned dependencies.</p>
-<p>禁止依赖org.slf4j:slf4j-log4j12:jar，因此打包不过，需要排除依赖</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2151,7 +2156,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-count">35</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2174,7 +2179,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">3</span>
+                      
+                    
+                    <span class="site-state-item-count">4</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2271,7 +2278,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">40</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>

@@ -433,7 +433,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-12 11:58:53" itemprop="dateModified" datetime="2019-04-12T11:58:53+08:00">2019-04-12</time>
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
               
             
           </span>
@@ -450,7 +450,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
 
                 
                 
@@ -1270,7 +1270,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-14 18:05:31" itemprop="dateModified" datetime="2019-04-14T18:05:31+08:00">2019-04-14</time>
+                <time title="修改时间：2019-04-20 15:15:23" itemprop="dateModified" datetime="2019-04-20T15:15:23+08:00">2019-04-20</time>
               
             
           </span>
@@ -1334,9 +1334,9 @@
 <hr>
 <h2 id="java内存区域"><a href="#java内存区域" class="headerlink" title="java内存区域"></a>java内存区域</h2><p>&emsp;&emsp;java对象生存的载体-运行时数据区，虚拟机中数据区大致包含如下图所示的几个区域：<br><img src="\images\pasted-74.png" alt="upload successful"><br>1、程序计数器<br>&emsp;&emsp;当前线程所执行的字节码的行号指示器，标识执行到的节点，这是一块较小的内存空间。由于任何时刻，一个处理器（多核处理器中的某一核）只会执行一个线程中的指令，因此，每个线程都有一个独立、私有的程序计数器。此区域（唯一一个）在java虚拟机规范中没有规定任何OOM的情况。<br>2、虚拟机栈<br>&emsp;&emsp;其生命周期与线程相同，方法在执行时都会创建一个栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息，每一个方法的调用就是相应栈帧在虚拟机栈中入栈和出栈的过程。<br>局部变量表：存放编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（指向对象起始地址的引用指针-HotSpot方案、或者指向一个代表对象的句柄或其他与此对象相关的位置）、returnAddress类型（执行一条字节码指令的地址）。其中，除long和double占用2个局部变量空间（Slot）外，其余只占用1个Slot。局部变量表所需内存空间在编译期间完成分配，运行期间不会改变大小，即，进入一个方法时，栈帧中所需分配的局部变量空间是确定的。java虚拟机规范对此区域规定了两类异常情况，1是线程请求的栈深度大于虚拟机所允许的深度时抛出StackOverflowError，2是可动态扩展的虚拟机栈扩展时无法申请到足够的内存时抛出OOM。<br>3、本地方法栈<br>&emsp;&emsp;HotSpot将其与虚拟机栈合二为一。它是为虚拟机所使用到的Native方法服务。它可能抛出的异常与虚拟机栈一致。<br>4、堆<br>&emsp;&emsp;此区域用于存放对象的实例。java虚拟机规范原文：The heap is the runtime data area from which memory for all class instances and arrays is allocated.此区域会抛出OOM异常。由于这个区域存分的是对象实例且是线程共享区域，因此在后续的内容中将以此为核心进行讲述。<br>5、方法区（HotSpot，jdk8之后已由元空间取代）<br>&emsp;&emsp;该区域用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据，为了与java堆区分开来，java虚拟机规范为其命了一个别名Non-Heap。该区域会抛出OOM。<br>6、运行时常量池<br>&emsp;&emsp;方法区的一部分，Clas文件中除了由类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池，用于存放编译期生产的各种字面量和符号引用。除了编译期间会产生常量，java允许运行期间产生常量并存放到运行时常量池中，如String.intern()。该区域是方法区的一部分，因此申请不到内存时也会抛出OOM。<br>7、直接内存<br>&emsp;&emsp;它不属于虚拟机运行时数据区的一部分，但其也可能出现OOM，且使用频繁（如NIO类，引入了基于通道（Channel）与缓冲区（Buffer）的I/O方式，可使用Native函数直接分配堆外内存，然后通过一个存储在java堆中的DirectByteBuffer对象作为这块内存的引用进行操作，这样避免了在java堆与Native堆中来回复制数据从而提升了性能）。该区域使用超过机器内存等限制时会抛出OOM。<br>8、元空间<br>&emsp;&emsp;如示意图中所述，HotSpot在jdk8（含）之后，已经移除了老年代（方法区），转由元空间（metaspace）实现，即本地内存Native Memory。<br>&emsp;&emsp;至于为什么使用本地内存替换永久代，官网有如此描述：This is part of the JRockit and Hotspot convergence effort. JRockit customers do not need to configure the permanent generation (since JRockit does not have a permanent generation) and are accustomed to not configuring the permanent generation.<br>&emsp;&emsp;具体移除细节，官网由如此描述：The proposed implementation will allocate class meta-data in native memory and move interned Strings and class statics to the Java heap.<br>&emsp;&emsp;详细信息参见官网地址<a href="http://openjdk.java.net/jeps/122" target="_blank" rel="noopener">http://openjdk.java.net/jeps/122</a></p>
 <hr>
-<h2 id="java对象"><a href="#java对象" class="headerlink" title="java对象"></a>java对象</h2><p>&emsp;&emsp;前面聊完java对象身存的载体的具体结构，下面我们聊一聊java对象本身的一些事，需要说明的的是，此处是基于HotSpot探讨java对象在堆空间上实例的创建、布局以及访问。<br>1、对象的创建<br>&emsp;&emsp;从语言层面来讲，java对象的创建就是一个new关键字，当应用运行时，虚拟机遇到一条new指令，将进行如下操作：<br>&emsp;&emsp;##检查类的加载：检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化。<br>&emsp;&emsp;##分配内存：java堆内存是否规整决定了如何分配内存，规整的内存，采用“指针碰撞”（Bump the Pointer），即从已用内存和空闲内存的指针分界点开始向空闲内存移动与对象大小相等的距离即可；如何内存不规整，则需要维护空闲列表（Free List），分配时从列表中选择足够大的空间划分给对象的实例。java堆是否规整与垃圾采集器是否带有压缩整理功能有关，如使用Serial、ParNew这种带Compact过程的收集器时采用指针碰撞，使用CMS这种基于Mark-Sweep算法的收集器时采用空闲列表。另外一个需要考虑的问题是线程安全，解决这个问题有两种方案，1是采用CAS保证原子性；2是为每个线程在java堆中预先分配一小块，即本地线程分配缓冲（TLAB），只需在分配新的TLAB时进行同步锁定，-XX：+/-UseTLAB。<br>&emsp;&emsp;##初始化为0值：此处不包括对象头，这个操作保证了对象的实例可以不赋初始值即可使用。<br>&emsp;&emsp;##对象头信息设置：对象头中包含如，这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄、锁等信息。<br>&emsp;&emsp;##初始化（执行<init>方法）：一般来说，执行new指令之后会接着执行<init>方法（由字节码中是否跟随invokespecial指令决定），从而，一个真正可以使用的对象诞生。<br>2、对象的内存布局<br>&emsp;&emsp;HotSpot中，对象在内存中存储的布局分为3部分：对象头（Header）、实例数据（Instance Data）以及对齐填充（Padding）。<br>&emsp;&emsp;##对象头：对象头包含两部分，1是用于存储对象自身的运行时数据Mark Work，在32位和64位的虚拟机中分别占32bit、64bit,包含信息如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向锁线程ID、偏向时间戳等。eg：32位未锁定状态的对象，25bit用于存储对象哈希码、4bit用于存储对象分代年龄、2bit用于存储锁标识位，1bit固定为0；2是类型指针，即对象指向它的类元数据的指针；对于数组来说，对象头还需有一块用于记录数组长度的数据从而确定数组的大小。<br>&emsp;&emsp;##实例数据：HotSpot默认的分配策略为longs/doubles、ints、shorts/chars、bytes/boolean、oops（Oddinary Pointers），相同宽度的字段被分配在一起，父类定义的变量位于子类变量之前（如果CompactFields=true，子类较窄的变量也可能插入到父类变量的空隙中）。<br>&emsp;&emsp;##对齐填充：HotSpot要求对象起始地址必须是8字节的整数倍，对象头正好符合，因此对象实例数据可用对齐填充来补全。<br>3、对象的访问定位<br>&emsp;&emsp;java程序需要通过栈上的reference数据来操作堆上的具体对象。<br>&emsp;&emsp;##使用句柄访问：reference中存储的是对象的句柄地址，句柄中包含了对象实例数据与类型数据各自的具体地址，此方式，java堆划分出特定的内存作为句柄池。对象的定位需要两次指针定位，1次找到句柄、另1次找到具体的对象，好处则在于垃圾回收后，对象并移动，不用更改reference中的地址，只需更改句柄池中对应的地址。<br>&emsp;&emsp;##使用直接指针访问：reference中存储的是对象地址。对象的定位一次就能找到，提升了性能，HotSpot采用此方案。</init></init></p>
+<h2 id="java对象"><a href="#java对象" class="headerlink" title="java对象"></a>java对象</h2><p>&emsp;&emsp;前面聊完java对象身存的载体的具体结构，下面我们聊一聊java对象本身的一些事，需要说明的的是，此处是基于HotSpot探讨java对象在堆空间上实例的创建、布局以及访问。<br>1、对象的创建<br>&emsp;&emsp;从语言层面来讲，java对象的创建就是一个new关键字，当应用运行时，虚拟机遇到一条new指令，将进行如下操作：<br>&emsp;&emsp;##检查类的加载：检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化。<br>&emsp;&emsp;##分配内存：java堆内存是否规整决定了如何分配内存，规整的内存，采用“指针碰撞”（Bump the Pointer），即从已用内存和空闲内存的指针分界点开始向空闲内存移动与对象大小相等的距离即可；如何内存不规整，则需要维护空闲列表（Free List），分配时从列表中选择足够大的空间划分给对象的实例。java堆是否规整与垃圾采集器是否带有压缩整理功能有关，如使用Serial、ParNew这种带Compact过程的收集器时采用指针碰撞，使用CMS这种基于Mark-Sweep算法的收集器时采用空闲列表。另外一个需要考虑的问题是线程安全，解决这个问题有两种方案，1是采用CAS保证原子性；2是为每个线程在java堆中预先分配一小块，即本地线程分配缓冲（TLAB），只需在分配新的TLAB时进行同步锁定，-XX：+/-UseTLAB。<br>&emsp;&emsp;##初始化为0值：此处不包括对象头，这个操作保证了对象的实例可以不赋初始值即可使用。<br>&emsp;&emsp;##对象头信息设置：对象头中包含如，这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄、锁等信息。<br>&emsp;&emsp;##初始化（执行<init>方法）：一般来说，执行new指令之后会接着执行<init>方法（由字节码中是否跟随invokespecial指令决定），从而，一个真正可以使用的对象诞生。<br>2、对象的内存布局<br>&emsp;&emsp;HotSpot中，对象在内存中存储的布局分为3部分：对象头（Header）、实例数据（Instance Data）以及对齐填充（Padding）。<br>&emsp;&emsp;##对象头：对象头包含两部分，1是用于存储对象自身的运行时数据Mark Work，在32位和64位的虚拟机中分别占32bit、64bit,包含信息如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向锁线程ID、偏向时间戳等。eg：32位未锁定状态的对象，25bit用于存储对象哈希码、4bit用于存储对象分代年龄、2bit用于存储锁标识位，1bit固定为0；2是类型指针，即对象指向它的类元数据的指针；对于数组来说，对象头还需有一块用于记录数组长度的数据从而确定数组的大小。<br>&emsp;&emsp;##实例数据：HotSpot默认的分配策略为longs/doubles、ints、shorts/chars、bytes/boolean、oops（Oddinary Pointers），相同宽度的字段被分配在一起，父类定义的变量位于子类变量之前（如果CompactFields=true，子类较窄的变量也可能插入到父类变量的空隙中）。<br>&emsp;&emsp;##对齐填充：HotSpot要求对象起始地址必须是8字节的整数倍，对象头正好符合，因此对象实例数据可用对齐填充来补全。<br>3、对象的访问定位<br>&emsp;&emsp;java程序需要通过栈上的reference数据来操作堆上的具体对象。<br>&emsp;&emsp;##使用句柄访问：reference中存储的是对象的句柄地址，句柄中包含了对象实例数据与类型数据各自的具体地址，此方式，java堆划分出特定的内存作为句柄池。对象的定位需要两次指针定位，1次找到句柄、另1次找到具体的对象，好处则在于垃圾回收后，对象并移动，不用更改reference中的地址，只需更改句柄池中对应的地址。<br>&emsp;&emsp;##使用直接指针访问：reference中存储的是对象地址。对象的定位一次就能找到，提升了性能，HotSpot采用此方案。<br>4、对象的存活<br>&emsp;&emsp;前一部分提到，java程序通过栈上的reference数据操作堆上的对象，被操作的对象称之为被引用。对象是否存活与其是否尚被引用有关，那么我们首先来谈一谈引用。<br>&emsp;&emsp;引用可分为强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）。<br>&emsp;&emsp;##强引用：类似于赋值语句那种，垃圾回收器不会回收被引用对象<br>&emsp;&emsp;##软引用：jdk提供了SoftReference类实现软引用，指一些有用但并非必须的对象，系统OOM之前会回收此类对象<br>&emsp;&emsp;##弱引用：jdk提供了WeakReference类实现弱引用，下一次GC时回收此类对象<br>&emsp;&emsp;##虚引用：jdk提供了PhantomReference类实现虚引用，也称之为幽灵引用，对象是否存在虚引用对其本身无任何影响，且无法通过虚引用获得一个对象实例，因此，为对象设置一个虚引用的唯一目的是该对象被回收时收到一个系统通知<br>&emsp;&emsp;下面来谈谈判断对象是否存活的两类算法：<br>&emsp;&emsp;引用计数算法：给对象添加一个引用计算器，值为0时代表对象可回收，但，对于循环依赖来说，这似乎是个问题<br>&emsp;&emsp;可达性分析算法：以一系列被称为GC Roots的对象（虚拟机栈即栈帧中本地变量表中引用的对象；方法区中类静态属性引用的对象；方法区中常量引用的对象；本地方法栈中JNI引用的对象）为起点进行搜索，判断对象是否有引用链到达GC Roots，如果没有，代表对象可回收。<br>&emsp;&emsp;需要说明的是，利用可达性分析出不可达的对象，并不一定会立即回收，因为进行标记时会做一次筛选（条件是对象是否有必要执行finalize(),如果对象没有覆盖此方法或此方法被执行过一次，则不必要，否则会把此类对象放入一个F-Queue队列中由虚拟机自建一个低优先级的Finalizer线程去执行，为了避免执行缓慢，其并不会等待执行结果）。  </init></init></p>
 <hr>
-<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>回收策略<br>hotspot垃圾回执器</p>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>&emsp;&emsp;前面大概聊了一下虚拟机内存区域以及java对象本身的那点事，这是一个java开发者必备的基础知识，因为你不仅仅应该知道Object obj = new Object（），你更应该清楚java对象究竟是如何诞生的，JVM在这里面做了什么，另一方面，你还应该清楚JVM又是如何替我们清理那些不再被引用的对象。<br>&emsp;&emsp;首先，我们来简单聊聊垃圾收集算法：<br>&emsp;&emsp;标记-清除（Mark-Sweep）算法：顾名思义，它包含两步，一是标记需要回收的对象，二是清除被标记的对象。但有两个明显的问题是，标记和清除两个环节效率都不高，其次，直接清除会导致内存碎片，这将导致大对象无法找到足够大小的连续空间来分配，从而提前下一次GC。<br>&emsp;&emsp;复制（Copying）算法：将内存划分为几块，当一块内存用完后，把存活的对象移动至另一块，再把当前块已使用的空间一性清理掉。但这会导致预留的那部分空间分配时不能用。如HotSpot实现为，将内存分为Eden和两个Survivor，Eden：Survivro为8：1，即预留了10%的空间。需要指出的是，如果对象生命周期长，那么预留的空间也许会出现不够用，这时便需要其他内存进行分配担保（Handle Promotion），这里指的是老年代内存。因为需要额外的空间做担保，那么此算法不适合老年代回收。<br>&emsp;&emsp;标记-整理（Mark-Compact）算法：完成标记后，让所有存活的对象向一端移动，然后直接清理掉端边界之外的内存。<br>&emsp;&emsp;最后要说明的是，当前的商业虚拟机采用分代收集，即区分新生代和老年代，根据其不同特点搭配不通的垃圾收集算法，如年轻代使用复制算法，老年代使用标记-清除算法或标记-整理算法。<br>&emsp;&emsp;HotSpot实现垃圾回收简介：<br>&emsp;&emsp;##进行对象可达性分析时，要考虑一致性问题，因为对象的引用随着应用线程的运行不停的变更着，因此需要STW，由于STW对应用线程影响很大，各种垃圾回收器中对此做了通盘的考虑，但即使如CMS这种号称不会STW的收集器也无法避免枚举根节点时的GC停顿。另外，HotSpot设计了基于OopMap的数据结构来记录对象的引用以提升效率。<br>&emsp;&emsp;安全点：为指令生产OopMap需要大量额外的空间，因此，HotSpot设计中并没为每条指令生成OopMap，只是在一些成为安全点的特定位置记录这些信息，即，只有当线程进入到安全点时才能暂停下来开始GC。安全点的选定是有讲究的，不可过多也不可过少，所以基本考虑在长时间执行的部分设置安全点，如方法调用、循环跳转、异常跳转等。对于线程在安全点如何停下来的问题，有两种手段，一是抢先式中断、二是主动式中断。HotSpot选择后者，即，GC设置中断标识，用户线程主动轮询是否需要中断，轮询标志的地方和安全点重合。<br>&emsp;&emsp;安全区域：对于某些暂时未分配到CUP时间的线程，如其处于Sleep或Blocked状态，JVM不可能瞎等其得到CPU时间后跑到安全点，因此提供了安全区域解决该问题。安全区域中，引用关系不会发生变化，线程进去安全区域时会标识自己已进入，离开时，需要判断系统是否已经完成了根节点枚举或者整个GC过程，没有完成时需等待接收可以离开的信号。</p>
 <hr>
 <h2 id="内存调优"><a href="#内存调优" class="headerlink" title="内存调优"></a>内存调优</h2><p>高性能的垃圾回收</p>
 
@@ -1568,6 +1568,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/01/18/druid连接的获取与创建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/01/18/druid连接的获取与创建/" class="post-title-link" itemprop="url">druid连接的获取与创建</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-18 19:49:00" itemprop="dateCreated datePublished" datetime="2019-01-18T19:49:00+08:00">2019-01-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-19 17:03:16" itemprop="dateModified" datetime="2019-04-19T17:03:16+08:00">2019-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>背景：服务器闪断时，druid连接池获取异常，且重试时间较长<br>经分析原因如下：<br>1、应用申请连接时，传入允许等待时间为10S<br>2、由于服务器闪断，瞬时出现部分线程A申请连接时，连接池中无空闲连接，因此A发出创建请求并等待（创建完成及返回连接，否则等待10s后返回失败）<br>3、线程A触发创建连接的线程，开始创建连接，此时可能创建失败，会30S后重新尝试创建<br>4、线程A同时会触发守护线程等待的信号量，守护线程接收到创建连接的信号量，也会开始创建连接，此时可能创建失败，会30S后重新尝试创建</p>
+<p>影响：<br>如果业务量不大，创建连接慢（或者创建失败），会引起部分线程执行慢<br>如果业务量过大，且创建连接慢（或者创建失败），会导致线程积压从而导致内存消耗殆尽引起应用假死</p>
+<p><img src="\images\pasted-75.png" alt="upload successful"></p>
+<p>别人画的图：</p>
+<p><img src="\images\pasted-76.png" alt="upload successful"><br><img src="\images\pasted-77.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/12/07/mongo-查询报no-property-found-on/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1613,7 +1790,7 @@
                 
               
 
-              <time title="创建时间：2018-12-07 15:11:20" itemprop="dateCreated datePublished" datetime="2018-12-07T15:11:20+08:00">2018-12-07</time>
+              <time title="创建时间：2018-12-07 15:11:00" itemprop="dateCreated datePublished" datetime="2018-12-07T15:11:00+08:00">2018-12-07</time>
             
 
             
@@ -1630,7 +1807,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-10 14:59:56" itemprop="dateModified" datetime="2019-04-10T14:59:56+08:00">2019-04-10</time>
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
               
             
           </span>
@@ -1647,7 +1824,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
 
                 
                 
@@ -1754,7 +1931,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/10/31/javaagent-bytebuddy/">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/11/13/disruptor为什么那么快/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Xiang Chuang">
@@ -1774,7 +1951,7 @@
           <h1 class="post-title" itemprop="name headline">
                 
                 
-                <a href="/2018/10/31/javaagent-bytebuddy/" class="post-title-link" itemprop="url">javaagent-bytebuddy</a>
+                <a href="/2018/11/13/disruptor为什么那么快/" class="post-title-link" itemprop="url">disruptor为什么那么快</a>
               
             
           </h1>
@@ -1799,7 +1976,7 @@
                 
               
 
-              <time title="创建时间：2018-10-31 17:01:00" itemprop="dateCreated datePublished" datetime="2018-10-31T17:01:00+08:00">2018-10-31</time>
+              <time title="创建时间：2018-11-13 17:05:00" itemprop="dateCreated datePublished" datetime="2018-11-13T17:05:00+08:00">2018-11-13</time>
             
 
             
@@ -1816,252 +1993,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-10 16:01:34" itemprop="dateModified" datetime="2019-04-10T16:01:34+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/外部引用/" itemprop="url" rel="index"><span itemprop="name">外部引用</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>Java agent是在另外一个Java应用（“目标”应用）启动之前要执行的Java程序，这样agent就有机会修改目标应用或者应用所运行的环境。在本文中，我们将会从基础内容开始，逐渐增强其功能，借助字节码操作工具Byte Buddy，使其成为高级的agent实现。</p>
-<p>在最基本的用例中，Java agent会用来设置应用属性或者配置特定的环境状态，agent能够作为可重用和可插入的组件。如下的样例描述了这样的一个agent，它设置了一个系统属性，在实际的程序中就可以使用该属性了：</p>
-<p>public class Agent {  public static void premain(String arg) {    System.setProperty(“my-property”, “foo”);  }}</p>
-<p>如上面的代码所述，Java agent的定义与其他的Java程序类似，只不过它使用premain方法替代main方法作为入口点。顾名思义，这个方法能够在目标应用的main方法之前执行。相对于其他的Java程序，编写agent并没有特定的规则。有一个很小的区别在于，Java agent接受一个可选的参数，而不是包含零个或更多参数的数组。</p>
-<p>如果要使用这个agent，必须要将agent类和资源打包到jar中，并且在jar的manifest中要将Agent-Class属性设置为包含premain方法的agent类。（agent必须要打包到jar文件中，它不能通过拆解的格式进行指定。）接下来，我们需要启动应用程序，并且在命令行中通过javaagent参数来引用jar文件的位置：</p>
-<p>java -javaagent:myAgent.jar -jar myProgram.jar</p>
-<p>我们还可以在位置路径上设置可选的agent参数。在下面的命令中会启动一个Java程序并且添加给定的agent，将值myOptions作为参数提供给premain方法：</p>
-<p>java -javaagent:myAgent.jar=myOptions -jar myProgram.jar</p>
-<p>通过重复使用javaagent命令，能够添加多个agent。</p>
-<p>但是，Java agent的功能并不局限于修改应用程序环境的状态，Java agent能够访问Java instrumentation API，这样的话，agent就能修改目标应用程序的代码。Java虚拟机中这个鲜为人知的特性提供了一个强大的工具，有助于实现面向切面的编程。</p>
-<p>如果要对Java程序进行这种修改，我们需要在agent的premain方法上添加类型为Instrumentation的第二个参数。Instrumentation参数可以用来执行一系列的任务，比如确定对象以字节为单位的精确大小以及通过注册ClassFileTransformers实际修改类的实现。ClassFileTransformers注册之后，当类加载器（class loader）加载类的时候都会调用它。当它被调用时，在类文件所代表的类加载之前，类文件transformer有机会改变或完全替换这个类文件。按照这种方式，在类使用之前，我们能够增强或修改类的行为，如下面的样例所示：</p>
-<p>public class Agent { public static void premain(String argument, Instrumentation inst) {   inst.addTransformer(new ClassFileTransformer() {     @Override     public byte[] transform(       ClassLoader loader,       String className,       Class&lt;?&gt; classBeingRedefined, // 如果类之前没有加载的话，值为null       ProtectionDomain protectionDomain,       byte[] classFileBuffer) {       // 返回改变后的类文件。     }   }); }}</p>
-<p>通过使用Instrumentation实例注册上述的ClassFileTransformer之后，每个类加载的时候，都会调用这个transformer。为了实现这一点，transformer会接受一个二进制和类加载器的引用，分别代表了类文件以及试图加载类的类加载器。</p>
-<p>Java agent也可以在Java应用的运行期注册，如果是在这种场景下，instrumentation API允许重新定义已加载的类，这个特性被称之为“HotSwap”。不过，重新定义类仅限于替换方法体。在重新定义类的时候，不能新增或移除类成员，并且类型和签名也不能进行修改。当类第一次加载的时候，并没有这种限制，如果是在这样的场景下，那classBeingRedefined会被设置为null。</p>
-<p>Java字节码与类文件格式</p>
-<p>类文件代表了Java类编译之后的状态。类文件中会包含字节码，这些字节码代表了Java源码中最初的程序指令。Java字节码可以视为Java虚拟机的语言。实际上，JVM并不会将Java视为编程语言，它只能处理字节码。因为它采用二进制的表现形式，所以相对于程序的源码，它占用的空间更少。除此之外，将程序以字节码的形式进行表现能够更容易地编译Java以外的其他语言，如Scala或Clojure，从而让它们运行在JVM上。如果没有字节码作为中间语言的话，那么其他的程序在运行之前，可能还需要将其转换为Java源码。</p>
-<p>但是，在代码处理的时候，这种抽象却带来了一定的成本。如果要将ClassFileTransformer应用到某个类上，那我们不能将该类按照Java源码的形式进行处理，甚至不能假设被转换的代码最初是由Java编写而成的。更糟糕的是，探查类成员或注解的反射API也是禁止使用的，这是因为类加载之前，我们无法访问这些API，而在转换进程完成之前，是无法进行加载的。</p>
-<p>所幸的是，Java字节码相对来讲是一个比较简单的抽象形式，它包含了很少量的操作，稍微花点功夫我们就能大致将其掌握起来。Java虚拟机执行程序的时候，会以基于栈的方式来处理值。字节码指令一般会告知虚拟机，需要从操作数栈（operand stack）上弹出值，执行一些操作，然后再将结果压到栈中。</p>
-<p>让我们考虑一个简单的样例：将数字1和2进行相加操作。JVM首先会将这两个数字压到栈中，这是通过 iconst_1和iconst_2这两个字节指令实现的。iconst_1是个单字节的便捷运算符（operator），它会将数字1压到栈中。与之类似，iconst_2会将数字2压到栈中。然后，会执行iadd指令，它会将栈中最新的两个值弹出，将它们求和计算的结果重新压到栈中。在类文件中，每个指令并不是以其易于记忆的名称进行存储的，而是以一个字节的形式进行存储，这个字节能够唯一地标记特定的指令，这也是bytecode这个术语的来历。上文所述的字节码指令及其对操作数栈的影响，通过下面的图片进行了可视化。</p>
-<p><img src="\images\pasted-54.png" alt="upload successful"></p>
-<p>对于人类用户来讲，会更喜欢源码而不是字节码，不过幸运的是Java社区创建了多个库，能够解析类文件并将紧凑的字节码暴露为具有名称的指令流。例如，流行的ASM库提供了一个简单的visitor API，它能够将类文件剖析为成员和方法指令，其操作方式类似于阅读XML文件时的SAX解析器。如果使用ASM的话，那上述样例中的字节码可以按照如下的代码来进行实现（在这里，ASM方式的指令是visitIns，能够提供修正的方法实现）：</p>
-<p>MethodVisitor methodVisitor = …methodVisitor.visitIns(Opcodes.ICONST_1);methodVisitor.visitIns(Opcodes.ICONST_2);methodVisitor.visitIns(Opcodes.IADD);</p>
-<p>需要注意的是，字节码规范只不过是一种比喻的说法（metaphor），因为Java虚拟机允许将程序转换为优化后的机器码（machine code），只要程序的输出能够保证是正确的即可。因为字节码的简洁性，所以在已有的类中取代和修改指令是很简单直接的。因此，使用ASM及其底层的Java字节码基础就足以实现类转换的Java agent，这需要注册一个ClassFileTransformer，它会使用这个库来处理其参数。</p>
-<p>克服字节码的不足</p>
-<p>对于实际的应用来讲，解析原始的类文件依然意味着有很多的手动工作。Java程序员通常感兴趣的是类型层级结构中的类。例如，某个Java agent可能需要修改所有实现给定接口的类。如果要确定某个类的超类，那只靠解析ClassFileTransformer所给定的类文件就不够了，类文件中只包含了直接超类和接口的名字。为了解析可能的超类型关联关系，程序员依然需要定位这些类型的类文件。</p>
-<p>在项目中直接使用ASM的另外一个困难在于，团队中需要有开发人员学习Java字节码的基础知识。在实践中，这往往会导致很多的开发人员不敢再去修改字节码操作相关的代码。如果这样的话，实现Java agent很容易为项目的长期维护带来风险。</p>
-<p>为了克服这些问题，我们最好使用较高层级的抽象来实现Java agent，而不是直接操作Java字节码。Byte Buddy是开源的、基于Apache 2.0许可证的库，它致力于解决字节码操作和instrumentation API的复杂性。Byte Buddy所声称的目标是将显式的字节码操作隐藏在一个类型安全的领域特定语言背后。通过使用Byte Buddy，任何熟悉Java编程语言的人都有望非常容易地进行字节码操作。</p>
-<p>Byte Buddy简介</p>
-<p>Byte Buddy的目的并不仅仅是为了生成Java agent。它提供了一个API用于生成任意的Java类，基于这个生成类的API，Byte Buddy提供了额外的API来生成Java agent。</p>
-<p>作为Byte Buddy的简介，如下的样例展现了如何生成一个简单的类，这个类是Object的子类，并且重写了toString方法，用来返回“Hello World!”。与原始的ASM类似，“intercept”会告诉Byte Buddy为拦截到的指令提供方法实现：</p>
-<p>Class&lt;?&gt; dynamicType = new ByteBuddy()  .subclass(Object.class)  .method(ElementMatchers.named(“toString”))  .intercept(FixedValue.value(“Hello World!”))  .make()  .load(getClass().getClassLoader(),                  ClassLoadingStrategy.Default.WRAPPER)  .getLoaded();</p>
-<p>从上面的代码中，我们可以看到Byte Buddy要实现一个方法分为两步。首先，编程人员需要指定一个ElementMatcher，它负责识别一个或多个需要实现的方法。Byte Buddy提供了功能丰富的预定义拦截器（interceptor），它们暴露在ElementMatchers类中。在上述的例子中，toString方法完全精确匹配了名称，但是，我们也可以匹配更为复杂的代码结构，如类型或注解。</p>
-<p>当Byte Buddy生成类的时候，它会分析所生成类型的类层级结构。在上述的例子中，Byte Buddy能够确定所生成的类要继承其超类Object的名为toString的方法，指定的匹配器会要求Byte Buddy重写该方法，这是通过随后的 Implementation 实例实现的，在我们的样例中，这个实例也就是FixedValue。</p>
-<p>当创建子类的时候，Byte Buddy始终会拦截（intercept）一个匹配的方法，在生成的类中重写该方法。但是，我们在本文稍后将会看到Byte Buddy还能够重新定义已有的类，而不必通过子类的方式来实现。在这种情况下，Byte Buddy会将已有的代码替换为生成的代码，而将原有的代码复制到另外一个合成的（synthetic）方法中。</p>
-<p>在我们上面的代码样例中，匹配的方法进行了重写，在实现里面，返回了固定的值“Hello World!”。intercept方法接受Implementation类型的参数，Byte Buddy自带了多个预先定义的实现，如上文所使用的FixedValue类。但是，如果需要的话，可以使用前文所述的ASM API将某个方法实现为自定义的字节码，Byte Buddy本身也是基于ASM API实现的。</p>
-<p>定义完类的属性之后，就能通过make方法来进行生成。在样例应用中，因为用户没有指定类名，所以生成的类会给定一个任意的名称。最终，生成的类将会使用ClassLoadingStrategy来进行加载。通过使用上述的默认 WRAPPER策略，类将会使用一个新的类加载器进行加载，这个类加载器会使用环境类加载器作为父加载器。</p>
-<p>类加载之后，使用Java反射API就可以访问它了。如果没有指定其他构造器的话，Byte Buddy将会生成类似于父类的构造器，因此生成的类可以使用默认的构造器。这样，我们就可以检验生成的类重写了 toString方法，如下面的代码所示：</p>
-<p>assertThat(dynamicType.newInstance().toString(),            is(“Hello World!”));</p>
-<p>当然，这个生成的类并没有太大的用处。对于实际的应用来讲，大多数方法的返回值是在运行时计算的，这个计算过程要依赖于方法的参数和对象的状态。</p>
-<p>通过委托实现Instrumentation</p>
-<p>要实现某个方法，有一种更为灵活的方式，那就是使用Byte Buddy的MethodDelegation。通过使用方法委托，在生成重写的实现时，我们就有可能调用给定类和实例的其他方法。按照这种方式，我们可以使用如下的委托器（delegator）重新编写上述的样例：</p>
-<p>class ToStringInterceptor {  static String intercept() {    return “Hello World!”;  }}</p>
-<p>借助上面的POJO拦截器，我们就可以将之前的FixedValue实现替换为MethodDelegation.to(ToStringInterceptor.class)：</p>
-<p>Class&lt;?&gt; dynamicType = new ByteBuddy()  .subclass(Object.class)  .method(ElementMatchers.named(“toString”))  .intercept(MethodDelegation.to(ToStringInterceptor.class))  .make()  .load(getClass().getClassLoader(),                  ClassLoadingStrategy.Default.WRAPPER)  .getLoaded();</p>
-<p>使用上述的委托器，Byte Buddy会在to方法所给定的拦截目标中，确定最优的调用方法。就ToStringInterceptor.class来讲，选择过程只是非常简单地解析这个类型的唯一静态方法而已。在本例中，只会考虑一个静态方法，因为委托的目标中指定的是一个类。与之不同的是，我们还可以将其委托给某个类的实例，如果是这样的话，Byte Buddy将会考虑所有的虚方法（virtual method）。如果类或实例上有多个这样的方法，那么Byte Buddy首先会排除掉所有与指定instrumentation不兼容的方法。在剩余的方法中，库将会选择最佳的匹配者，通常来讲这会是参数最多的方法。我们还可以显式地指定目标方法，这需要缩小合法方法的范围，将ElementMatcher传递到MethodDelegation中，就会进行方法的过滤。例如，通过添加如下的filter，Byte Buddy只会将名为“intercept”的方法视为委托目标：</p>
-<p>MethodDelegation.to(ToStringInterceptor.class)                .filter(ElementMatchers.named(“intercept”))</p>
-<p>执行上面的拦截之后，被拦截到的方法依然会打印出“Hello World!”，但是这次的结果是动态计算的，这样的话，我们就可以在拦截器方法上设置断点，所生成的类每次调用toString时，都会触发拦截器的方法。</p>
-<p>当我们为拦截器方法设置参数时，就能释放出MethodDelegation的全部威力。这里的参数通常是带有注解的，用来要求Byte Buddy在调用拦截器方法时，注入某个特定的值。例如，通过使用@Origin注解，Byte Buddy提供了添加instrument功能的方法的实例，将其作为Java反射API中类的实例：</p>
-<p>class ContextualToStringInterceptor {  static String intercept(@Origin Method m) {    return “Hello World from ” + m.getName() + “!”;  }}</p>
-<p>当拦截toString方法时，对instrument方法的调用将会返回“Hello world from toString!”。</p>
-<p>除了@Origin注解以外，Byte Buddy提供了一组功能丰富的注解。例如，通过在类型为Callable的参数上使用@Super注解，Byte Buddy会创建并注入一个代理实例，它能够调用被instrument方法的原始代码。如果对于特定的用户场景，所提供的注解不能满足需求或者不太适合的话，我们甚至能够注册自定义的注解，让这些注解注入用户特定的值。</p>
-<p>实现方法级别的安全性</p>
-<p>可以看到，我们在运行时可以借助简单的Java代码，使用MethodDelegation来动态重写某个方法。这只是一个简单的样例，但是这项技术可以用到更加实际的应用之中。在本文剩余的内容中，我们将会开发一个样例，它会使用代码生成技术实现一个注解驱动的库，用来限制方法级别的安全性。在我们的第一个迭代中，这个库会通过生成子类的方式来限制安全性。然后，我们将会采取相同的方式来实现Java agent，完成相同的功能。</p>
-<p>样例库会使用如下的注解，允许用户指定某个方法需要考虑安全因素：</p>
-<p>@interface Secured {  String user();}</p>
-<p>例如，假设应用需要使用如下的Service类来执行敏感操作，并且只有用户被认证为管理员才能执行该方法。这是通过为执行这个操作的方法声明Secured注解来指定的：</p>
-<p>class Service {  @Secured(user = “ADMIN”)  void doSensitiveAction() {    // 运行敏感代码…  }}</p>
-<p>我们当然可以将安全检查直接编写到方法中。在实际中，硬编码横切关注点往往会导致复制-粘贴的逻辑，使其难以维护。另外，一旦应用需要涉及额外的需求时，如日志、收集调用指标或结果缓存，直接添加这样的代码扩展性不会很好。通过将这样的功能抽取到agent中，方法就能很纯粹地关注其业务逻辑，使得代码库能够更易于阅读、测试和维护。</p>
-<p>为了让我们规划的库保持尽可能得简单，按照注解的协议声明，如果当前用户不具备注解的用户属性时，将会抛出IllegalStateException异常。通过使用Byte Buddy，这种行为可以用一个简单的拦截器来实现，如下面样例中的SecurityInterceptor所示，它会通过其静态的user域，跟踪当前用户已经进行了登录：</p>
-<p>class SecurityInterceptor {  static String user = “ANONYMOUS”  static void intercept(@Origin Method method) {    if (!method.getAnnotation(Secured.class).user().equals(user)) {      throw new IllegalStateException(“Wrong user”);    }  }}</p>
-<p>通过上面的代码，我们可以看到，即便给定用户授予了访问权限，拦截器也没有调用原始的方法。为了解决这个问题，Byte Buddy有很多预定义的方法可以实现功能的链接。借助MethodDelegation类的andThen方法，上述的安全检查可以放到原始方法的调用之前，如下面的代码所示。如果用户没有进行认证的话，安全检查将会抛出异常并阻止后续的执行，因此原始方法将不会执行。</p>
-<p>将这些功能集合在一起，我们就能生成Service的一个子类，所有带有注解方法的都能恰当地进行安全保护。因为所生成的类是Service的子类，所以它能够替代所有类型为Service的变量，并不需要任何的类型转换，如果没有恰当认证的话，调用doSensitiveAction方法就会抛出异常：</p>
-<p>new ByteBuddy()  .subclass(Service.class)  .method(ElementMatchers.isAnnotatedBy(Secured.class))  .intercept(MethodDelegation.to(SecurityInterceptor.class)                             .andThen(SuperMethodCall.INSTANCE)))  .make()  .load(getClass().getClassLoader(),           ClassLoadingStrategy.Default.WRAPPER)  .getLoaded()  .newInstance()  .doSensitiveAction();</p>
-<p>不过坏消息是，因为实现instrumentation功能的子类是在运行时创建的，所以除了使用Java反射以外，没有其他办法创建这样的实例。因此，所有instrumentation类的实例都应该通过一个工厂来创建，这个工厂会封装创建instrumentation子类的复杂性。这样造成的结果就是，子类instrumentation通常会用于框架之中，这些框架本身就需要通过工厂来创建实例，例如，像依赖管理的框架Spring或对象-关系映射的框架Hibernate，而对于其他类型的应用来讲，子类instrumentation实现起来通常过于复杂。</p>
-<p>实现安全功能的Java agent</p>
-<p>通过使用Java agent，上述安全框架的一个替代实现将会修改Service类的原始字节码，而不是重写它。这样做的话，我们就没有必要创建托管的实例了，只需简单地调用</p>
-<p>new Service().doSensitiveAction()</p>
-<p>即可，如果对应的用户没有进行认证的话，就会抛出异常。为了支持这种方式，Byte Buddy提供一种称之为rebase某个类的理念。当rebase某个类的时候，不会创建子类，所采用的策略是实现instrumentation功能的代码将会合并到被instrument的类中，从而改变其行为。在添加instrumentation功能之后，在被instrument的类中，其所有方法的原始代码均可进行访问，因此像SuperMethodCall这样的instrumentation，工作方式与创建子类是完全一样的。</p>
-<p>创建子类与rebase的行为是非常类似的，所以两种操作的API执行方式是一致的，都会使用相同的DynamicType.Builder接口来描述某个类型。两种形式的instrumentation都可以通过ByteBuddy类来进行访问。为了使Java agent的定义更加便利，Byte Buddy还提供了 AgentBuilder类，它希望能够以一种简洁的方式应对一些通用的用户场景。为了定义Java agent实现方法级别的安全性，将如下的类定义为agent的入口点就足以完成该功能了：</p>
-<p>class SecurityAgent {  public static void premain(String arg, Instrumentation inst) {    new AgentBuilder.Default()    .type(ElementMatchers.any())    .transform((builder, type) -&gt; builder    .method(ElementMatchers.isAnnotatedBy(Secured.class)    .intercept(MethodDelegation.to(SecurityInterceptor.class)               .andThen(SuperMethodCall.INSTANCE))))    .installOn(inst);  }}</p>
-<p>如果将这个agent打包为jar文件并在命令行中进行指定，那么所有带有Secured注解的方法将会进行“转换”或重定义，从而实现安全保护。如果不激活这个Java agent的话，应用在运行时就不包含额外的安全检查。当然，这意味着如果对带有注解的代码进行单元测试的话，这些方法的调用并不需要特殊的搭建过程来模拟安全上下文。Java运行时会忽略掉无法在classpath中找到的注解类型，因此在运行带有注解的方法时，我们甚至完全可以在应用中移除掉安全库。</p>
-<p>另外一项优势在于，Java agent能够很容易地进行叠加。如果在命令行中指定多个Java agent的话，每个agent都有机会对类进行修改，其顺序就是在命令行中所指定的顺序。例如，我们可以采取这种方式将安全、日志以及监控框架联合在一起，而不需要在这些应用间增添任何形式的集成层。因此，使用Java agent实现横切的关注点提供了一种更为模块化的代码编写方式，而不必针对某个管理实例的中心框架来集成所有的代码。</p>
-<p>查看英文原文：Easily Create Java Agents with Byte Buddy</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/09/10/zookeeper-反复重连问题/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/09/10/zookeeper-反复重连问题/" class="post-title-link" itemprop="url">zookeeper-反复重连问题</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-09-10 18:09:00" itemprop="dateCreated datePublished" datetime="2018-09-10T18:09:00+08:00">2018-09-10</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 15:13:47" itemprop="dateModified" datetime="2019-04-10T15:13:47+08:00">2019-04-10</time>
+                <time title="修改时间：2019-04-19 17:16:00" itemprop="dateModified" datetime="2019-04-19T17:16:00+08:00">2019-04-19</time>
               
             
           </span>
@@ -2115,13 +2047,8 @@
       
         
           
-            <p>现象，zk后台日志发现频繁刷如下日志<br>Refusing session request for client /192.168.46.4:48551 as it has seen zxid 0x3cdf3127 our last zxid is 0x5bba6c client must try another server</p>
-<p>大量刷日志导致zk性能下降，最终导致依赖于zk的服务不可用</p>
-<p>经分析：<br>日志来源代码为 org.apache.zookeeper.server.ZooKeeperServer</p>
-<p><img src="\images\pasted-18.png" alt="upload successful"><br>lastProcessedZxid在zk中用于记录版本信息，即客户端与服务端版本控制</p>
-<p>后经反馈得知，18.09.07由于snet环境zk日志量大，曾情况过zk数据目录数据，当时导致各应用zk不可用，要求各应用重启，后续大部分应用重启完成后业务正常使用，但并没有核对所有系统是否都重启</p>
-<p>因此，部分没有重启的应用本地的版本信息还是老的信息，拿此信息与zk服务端交互，由于版本信息不对，导致zk拒绝连接，从而客户端又频繁发起重连尝试。。。</p>
-<p>解决，一旦发起过zk数据目录删除，或者迁移，请务必确保所有应用全部重启以获取最新的版本信息</p>
+            <p>disruptor可用于线程间数据交互<br>详细参考文章<a href="http://ifeve.com/disruptor/" target="_blank" rel="noopener">http://ifeve.com/disruptor/</a></p>
+<p>概述一下为什么那么快（这将有利于你借鉴思想）<br>1、私有序列号，它是AtomicLong类型的，基于CAS（cpu级指令），因此没有锁<br>2、缓存行填充，避免伪共享（一个缓存行64字节，对应8个long）<br>   伪共享：多个线程修改相互独立的变量时，如果它们位于同一个缓存行，则         会影响性能<br>    java8：@Contended（自动填充缓存行），<br>        但需要jvm参数-XX:RestrictContended<br>   注意，缓存行的填充是以存储换性能。。。<br>3、内存屏障 volatile   </p>
 
           
         
@@ -2209,7 +2136,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">32</span>
+                    <span class="site-state-item-count">35</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2232,7 +2159,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">3</span>
+                      
+                    
+                    <span class="site-state-item-count">4</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2329,7 +2258,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">40</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
