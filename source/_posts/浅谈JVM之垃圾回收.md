@@ -109,9 +109,9 @@ date: 2019-04-08 16:54:00
 ![upload successful](\images\pasted-85.png)
 &emsp;&emsp;##Parallel Old收集器：于jdk1.6开始提供，作为Parallel Scavenge的老年代收集器。采用标记-整理算法
 ![upload successful](\images\pasted-85.png)
-&emsp;&emsp;##CMS收集器：更加关注暂停时间，即追求最短暂停时间。采用标记-清除算法
+&emsp;&emsp;##CMS收集器：更加关注暂停时间，即追求最短暂停时间。其大概包含4个步骤，初始标记、并发标记、重新标记、并发清除，其中，初始标记主要是标记GC Roots能直接关联到的对象，这是一个很快的过程，需要STW，并发标记根据初始标记结果遍历上述对象所引用的对象，这个过程耗时较长但能与用户线程并行执行，重新标记则是修正并发标记过程中用户线程导致的变动，相对并发标记来说耗时是比较短的，需要STW，最后，并发清除也能与用户线程并行执行。需要指出的是，CMS存在一定的缺点，1是其对CPU资源很敏感，比如其并发阶段是占用了CPU资源（即用户线程占用CPU时间会减少），默认线程数为（CPU数量+3）/4；2是其无法处理浮动垃圾（Floating Garbage），导致会出现Concurrent Mode Failure，从而引起Full GC，引起的原因在于并发清理阶段用户线程的运行会产生新的垃圾需下一次GC才可处理，因此CMS开始回收的阈值为默认92%，避免浮动垃圾导致内存不够用而引起Full GC（这时会临时启用Serial Old回收老年代）；3是其基于标记-清除算法，意味着存在内存碎片，那么碎片过多会导致大对象无法分配而导致Full GC，因此有一个开关参数-XX:UseCMSCompactAtFullCollection控制其在准备Full GC时进行内存整理（这是很耗时的）。采用标记-清除算法
 ![upload successful](\images\pasted-86.png)
-&emsp;&emsp;##G1收集器：在暂停时间于吞吐量中权衡。整体来看采用标记-整理算法，局部（region之间）来看采用了复制算法。
+&emsp;&emsp;##G1收集器：在暂停时间于吞吐量中权衡。采用G1回收器意味着java堆内存布局与其他回收器将有很大的不同，其将堆分成多个（默认2048个）大小相等的region区域（1M-32M）。注意，超过区域大小一半的对象被视为巨型对象直接分配在老年代。同时，G1维护了一个优先列表用于标识回收各区域的价值大小，从而做到了可预测停顿。同时为了避免全堆扫描对象引用，G1提供了Remembered Set用以维护对象的引用。G1回收大致包含如下4个步骤，初始标记、并发标记、最终标记及筛选回收，各步骤的大致功能与CMS类似。整体来看采用标记-整理算法，局部（region之间）来看采用了复制算法。
 ![upload successful](\images\pasted-87.png)
 
 
@@ -119,4 +119,32 @@ date: 2019-04-08 16:54:00
 
 ## 内存调优
  
-高性能的垃圾回收
+&emsp;&emsp;前面已经讲述了对象的诞生与消亡，在实际的工作中，我们日常开发或许并没有过多关注于这些细节，但有一项是我们时常直接接触到的，即，在应用内存使用不正常、应用运行慢时，我们往往会想到是否存在内存使用上的问题，并想办法进行内存调优。内存调优，它没有一个统一的解决方案，只能说其有相同的调优原则，再结合应用的实际情况针对性的优化，因此，要谈内存调优，更好的方式是从案例入手，在案例中阐述问题分析的过程，如何定位到内存上的问题，又如何进行针对性的调优。本博客中有相关案例，可参考https://realxc.github.io/tags/JVM/
+&emsp;&emsp;作为本篇文章的结尾，下面简单介绍一下我们常用的ParNew、CMS、G1回收器的常用且重要的参数配置：
+ParNew：
+&emsp;&emsp;-XX:SurvivorRatio=8(默认)中年代占比1：8 sur：eden
+&emsp;&emsp;-XX:PretenureSizeThreshold 直接晋升到老年代的对象大小
+&emsp;&emsp;-XX:NewRatio=4(默认) 年轻代和老年代比例
+CMS
+&emsp;&emsp;-XX:CMSInitiatinOccupancyFraction=92 老年代达到92%时回收
+&emsp;&emsp;-XX:UseCMSCompactAtFullCollection控制其在准备Full GC时进行内存整理
+&emsp;&emsp;-XX:UseConcMarkSweepGC
+G1
+&emsp;&emsp;-XX:+UseG1GC
+&emsp;&emsp;-XX:MaxGCPauseMillis=n 单次GC暂停时间，默认200ms
+&emsp;&emsp;-XX:InitiatingHeapOccupancyPercent=n mix gc触发时间，老年代已使用空间占用整堆内存比例，默认45（很多人理解为整堆已使用空间占整堆比例，这是错误的）
+&emsp;&emsp;-XX:MaxTenuringThreshold=n 年轻代最大年龄，默认15
+&emsp;&emsp;-XX:G1ReservePercent=n 预留空间大小，避免空间被使用完而导致Full GC
+&emsp;&emsp;-XX:G1HeapRegionSize=n 区域大小，1-32（M）
+&emsp;&emsp;-XX:G1NewSizePercent=5 默认为5，如果要调整，需解锁实验性标志 eg：-XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=75
+&emsp;&emsp;-XX:G1MaxNewSizePercent=60 默认为60，如果要调整，需解锁实验性标志 eg：-XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=75
+
+----------------------------------
+参考参数（jdk8）：
+(G1): -XX:+UseG1GC -XX:MaxGCPauseMillis=50（自定义） -Xms4096m（自定义） -Xmx4096m（自定义） -XX:MetaspaceSize=128m（自定义） -XX:MaxMetaspaceSize=512m（自定义） -XX:LargePageSizeInBytes=128m（自定义） -XX:+ParallelRefProcEnabled -XX:+PrintAdaptiveSizePolicy -XX:+UseFastAccessorMethods -XX:+TieredCompilation -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000  -verbosegc -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/XXX/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/XXX/oom-XX.hprof
+
+----------------------------------
+(CMS):-Xms4096m（自定义） -Xmx4096m（自定义） -XX:MetaspaceSize=128m（自定义） -XX:MaxMetaspaceSize=512m（自定义） -XX:SurvivorRatio=8（自定义） -XX:NewRatio=4（自定义） -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m（自定义） -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70（自定义） -XX:+UseParNewGC -XX:MaxTenuringThreshold=5（自定义） -XX:+CMSClassUnloadingEnabled -XX:+TieredCompilation -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -verbosegc -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/XXX/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/XXX/oom-XX.hprof
+
+			
+----------------------------------
