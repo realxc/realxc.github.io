@@ -146,5 +146,7 @@ G1
 ----------------------------------
 (CMS):-Xms4096m（自定义） -Xmx4096m（自定义） -XX:MetaspaceSize=128m（自定义） -XX:MaxMetaspaceSize=512m（自定义） -XX:SurvivorRatio=8（自定义） -XX:NewRatio=4（自定义） -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m（自定义） -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70（自定义） -XX:+UseParNewGC -XX:MaxTenuringThreshold=5（自定义） -XX:+CMSClassUnloadingEnabled -XX:+TieredCompilation -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -verbosegc -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/XXX/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/XXX/oom-XX.hprof
 
+https://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html
+https://www.oracle.com/technetwork/cn/articles/java/g1gc-1984535-zhs.html#Unlock
 			
 ----------------------------------

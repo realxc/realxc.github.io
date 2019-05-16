@@ -371,6 +371,540 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/19/rabbitmq-报not-equivalent错/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/07/19/rabbitmq-报not-equivalent错/" class="post-title-link" itemprop="url">rabbitmq-报not equivalent错</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-19 17:28:00" itemprop="dateCreated datePublished" datetime="2018-07-19T17:28:00+08:00">2018-07-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>问题：<br>支付引擎往monitor发送监控mq消息时，报错：<br>2018-07-19 15:54:35.423 ERROR [AMQP Connection 10.21.30.153:5672] CachingConnectionFactory– Channel shutdown: channel error; protocol method: #method&lt;channel.close&gt;(reply-code=406, reply-text=PRECONDITION_FAILED - parameters for queue ‘queue.monitor.logmsg’ in vhost ‘/‘ not equivalent, class-id=50, method-id=10)<br>Caused by: com.rabbitmq.client.ShutdownSignalException: channel error; protocol method: #method&lt;channel.close&gt;(reply-code=406, reply-text=PRECONDITION_FAILED - parameters for queue ‘queue.monitor.logmsg’ in vhost ‘/‘ not equivalent, class-id=50, method-id=10)</p>
+<p>原因：<br>支付引擎使用monitor客户端发送mq消息，由如下逻辑：<br><img src="\images\pasted-43.png" alt="upload successful"></p>
+<p><img src="\images\pasted-44.png" alt="upload successful"></p>
+<p><img src="\images\pasted-45.png" alt="upload successful"></p>
+<p><img src="\images\pasted-46.png" alt="upload successful"><br>问题出在：new Queue(XXX);<br>我们来看看参数：true、false、false。  但是mq服务器上当前的队列是monitor系统通过spring集成创建的，参数为：<br>false、false、true  同样的队列名，参数不一致，mq会报上述错误<br><img src="\images\pasted-47.png" alt="upload successful"></p>
+<p><img src="\images\pasted-48.png" alt="upload successful"><br>解决方案：<br>合理的方案：保持参数一致<br>临时方案：停止monitor，这是队列自动删除了，启动支付引擎，创建队列，再启动monitor，因为monitor是采用spring方式创建队列，不会尝试重新创建</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/17/应用停机-优雅停机问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/07/17/应用停机-优雅停机问题/" class="post-title-link" itemprop="url">应用停机-优雅停机问题</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-17 14:28:00" itemprop="dateCreated datePublished" datetime="2018-07-17T14:28:00+08:00">2018-07-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-19 17:32:20" itemprop="dateModified" datetime="2019-04-19T17:32:20+08:00">2019-04-19</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>优雅停机问题，new对象的时候，应用classloader可能已经关闭了哦！</p>
+<p>TomcatEmbeddedWebappClassLoader<br>  context: ROOT<br>  delegate: true<br>———-&gt; Parent Classloader:<br>sun.misc.Launcher$AppClassLoader@14dad5dc</p>
+<p><img src="\images\pasted-19.png" alt="upload successful"></p>
+<p><img src="\images\pasted-20.png" alt="upload successful"></p>
+<p><img src="\images\pasted-21.png" alt="upload successful"></p>
+<p>理论分析：<br>spring-boot启动：<br>1、new SpringApplication(Main.class).run(args);<br>     1.1、加载SpringApplicationRunListeners并执行started()<br>     1.2、createAndRefreshContext<br>            1.2.1、Create and configure the environment<br>            1.2.2、Create, load, refresh and run the ApplicationContext                                        【org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext】<br>            1.2.3、Add boot specific singleton beans-&gt;springApplicationArguments<br>            1.2.4、Load the sources-&gt;Main方法<br>            1.2.5、SpringApplicationRunListeners执行contextLoaded<br>            1.2.6、Refresh the context-&gt;AbstractApplicationContext<br>                        1.2.6.1、Prepare this context for refreshing.<br>                        1.2.6.2、Tell the subclass to refresh the internal bean factory.<br>                        1.2.6.3、Prepare the bean factory for use in this context.<br>                        1.2.6.4、Allows post-processing of the bean factory in context subclasses.<br>                   【org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer】<br>                        1.2.6.5、Invoke factory processors registered as beans in the context.<br>                        1.2.6.6、Register bean processors that intercept bean creation.<br>                        1.2.6.7、Initialize message source for this context.<br>                        1.2.6.8、Initialize event multicaster for this context.<br>                        1.2.6.9、Initialize other special beans in specific context subclasses.<br>                        1.2.6.10、Check for listener beans and register them.<br>                        1.2.6.11、Instantiate all remaining (non-lazy-init) singletons.<br>                        1.2.6.12、Last step: publish corresponding event.<br>        1.3、call finished listener（可以做自己的事哦，yijiboot在这里就注册系统关闭钩子）<br>        eg:com.yiji.boot.core.listener.YijiApplicationRunListener<br>        new ShutdownThread().register();  -&gt;shutdownApp();</p>
+<p>spring-boot关闭： AbstractApplicationContext.doClose()<br>    1、Publish shutdown event.<br>        earlyApplicationEvents（里面对应的事件，延迟执行）<br>        eg：我们配置的dubbo关闭钩子就是同步执行的<br>    2、Stop all Lifecycle beans, to avoid delays during individual destruction.<br>    3、Destroy all cached singletons in the context’s BeanFactory.<br>    4、Close the state of this context itself.<br>    5、Let subclasses do some final clean-up if they wish…<br>    【org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.doClose()】<br><img src="\images\pasted-22.png" alt="upload successful"><br>18.07.12<br>又出问题啦<br>自主化发布时，直接替换项目包，项目自动重启了，且，没有消费掉dubbo</p>
+<p>经分析：<br>账务系统采用的依旧是war包的方式，部署在tomcat容器的。</p>
+<p>因此，替换war包后，项目自动重启，首先关闭tomcat容器，calssloader注销，然后注销springbean（这时候就出问题啦，因此某些bean已经不存在，不可使用）<br><img src="\images\pasted-23.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/12/springboot-spring-boot-starter-actuator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/07/12/springboot-spring-boot-starter-actuator/" class="post-title-link" itemprop="url">springboot-spring-boot-starter-actuator</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-12 16:03:00" itemprop="dateCreated datePublished" datetime="2018-07-12T16:03:00+08:00">2018-07-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-04-10 15:44:39" itemprop="dateModified" datetime="2019-04-10T15:44:39+08:00">2019-04-10</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>应用监控管理<br>自定义健康检测器，实现org.springframework.boot.actuate.health.AbstractHealthIndicator<br>充分利用java.lang.management.ManagementFactory，获取系统资源情况</p>
+<p>易极付：<br>基于spring-boot的应用健康监控：<br>dubboHealthIndicator      dubbo健康检查<br>deadlockedThreadsHealthIndicator  死锁线程检查<br>threadsCountHealthIndicator 线程数量检查，阈值2000<br>systemLoadHealthIndicator cpu负载检查，阈值1/3<br>rabbitHealthIndicator rabbitmq可用性检查<br>sessionYedisHealthIndicator  sessionRedis可用性检查<br>tomcatHealthIndicator 线程占用数量 阈值1半，   tomcat默认最大线程400<br>yedisHealthIndicator redis可用性检查<br>diskSpaceHealthIndicator 硬盘空间检查 阈值management.health.diskspace.threshold=524288000<br>dataSourceHealthIndicator  使用select 1检查连接 （spring-boot提供）</p>
+<p><img src="\images\pasted-17.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/12/druid-filter/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1428,353 +1962,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/mysql-TIMESTAMP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/mysql-TIMESTAMP/" class="post-title-link" itemprop="url">mysql -TIMESTAMP</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>The TIMESTAMP data type is used for values that contain both date and time parts. TIMESTAMP has a range of ‘1970-01-01 00:00:01’ UTC to ‘2038-01-19 03:14:07’ UTCThe TIMESTAMP data type is used for values that contain both date and time parts. TIMESTAMP has a range of ‘1970-01-01 00:00:01’ UTC to ‘2038-01-19 03:14:07’ UTC</p>
-<p>UTC+8: 2038-01-19 11:14:07</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/浏览器-资源加载/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/浏览器-资源加载/" class="post-title-link" itemprop="url">浏览器-资源加载</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>浏览器在同一个域名下并发加载资源（js，图片，css等）数是有限的，ie8（6个），谷歌（4-6个），<br>解决：将资源尽可能分布在不同的域名下。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/淘宝架构-进化/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1937,180 +2124,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2017/07/20/struts2-no-action-in-maven/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2017/07/20/struts2-no-action-in-maven/" class="post-title-link" itemprop="url">struts2-no action in maven</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-07-20 12:30:00" itemprop="dateCreated datePublished" datetime="2017-07-20T12:30:00+08:00">2017-07-20</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-04-10 16:18:56" itemprop="dateModified" datetime="2019-04-10T16:18:56+08:00">2019-04-10</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>原因：convention插件默认不扫描jar中的action<br> 解决方案：<a href="http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)" target="_blank" rel="noopener">http://struts.apache.org/release/2.3.x/docs/convention-plugin.html#ConventionPlugin-Actionsinjarfiles(struts2convention插件说明)</a><br>    <!-- the jar URL can contain a path to the jar file and a trailing "!/" --><br>    <constant name="struts.convention.action.includeJars" value=".*?/Imanage\w*.*?jar(!/)?">  匹配 前缀为Imanage的所有jar</constant></p>
-<p><img src="\images\pasted-56.png" alt="upload successful"></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2157,7 +2170,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">35</span>
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2283,7 +2296,19 @@
                     
                       
                     
-                    <span class="site-state-item-count">42</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">48</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
