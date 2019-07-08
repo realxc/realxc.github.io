@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文将阐述在基于spring-boot1.3.5日常开发中所遇到的一个疑惑的问题，下面将按照问题处理的过程进行行文！！！ 一、项目简介：    这儿有一个业务系统，我们称之为M，架构基于springboot1.3.5，同时提供了web能力，前后端分离。线上生产环境中，外部商户的【取现业务】会跳转到本系统的页面上进行操作，实际场景中更多的是手机端进行页面跳转，但也可以PC端网页版跳转，因为M是基于s">
+<meta name="keywords" content="这些年，那些坑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring-boot1.3.5支持jsp导致浏览器访问应用偶尔慢">
+<meta property="og:url" content="http://realxc.githut.io/2019/07/08/spring-boot1-3-5支持jsp导致浏览器访问应用偶尔慢/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="本文将阐述在基于spring-boot1.3.5日常开发中所遇到的一个疑惑的问题，下面将按照问题处理的过程进行行文！！！ 一、项目简介：    这儿有一个业务系统，我们称之为M，架构基于springboot1.3.5，同时提供了web能力，前后端分离。线上生产环境中，外部商户的【取现业务】会跳转到本系统的页面上进行操作，实际场景中更多的是手机端进行页面跳转，但也可以PC端网页版跳转，因为M是基于s">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-88.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-89.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-90.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-91.png">
+<meta property="og:updated_time" content="2019-07-08T08:23:46.543Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring-boot1.3.5支持jsp导致浏览器访问应用偶尔慢">
+<meta name="twitter:description" content="本文将阐述在基于spring-boot1.3.5日常开发中所遇到的一个疑惑的问题，下面将按照问题处理的过程进行行文！！！ 一、项目简介：    这儿有一个业务系统，我们称之为M，架构基于springboot1.3.5，同时提供了web能力，前后端分离。线上生产环境中，外部商户的【取现业务】会跳转到本系统的页面上进行操作，实际场景中更多的是手机端进行页面跳转，但也可以PC端网页版跳转，因为M是基于s">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-88.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://realxc.githut.io/2019/07/08/spring-boot1-3-5支持jsp导致浏览器访问应用偶尔慢/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>spring-boot1.3.5支持jsp导致浏览器访问应用偶尔慢 | 博客园-向闯</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">博客园-向闯</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-schedule">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/schedule/" rel="section"><i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>日程表</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/07/08/spring-boot1-3-5支持jsp导致浏览器访问应用偶尔慢/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">spring-boot1.3.5支持jsp导致浏览器访问应用偶尔慢
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-08 14:42:00 / 修改时间：16:23:46" itemprop="dateCreated datePublished" datetime="2019-07-08T14:42:00+08:00">2019-07-08</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/springboot/jsp/" itemprop="url" rel="index"><span itemprop="name">jsp</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文将阐述在基于spring-boot1.3.5日常开发中所遇到的一个疑惑的问题，下面将按照问题处理的过程进行行文！！！</p>
+<p>一、项目简介：<br>    这儿有一个业务系统，我们称之为M，架构基于springboot1.3.5，同时提供了web能力，前后端分离。线上生产环境中，外部商户的【取现业务】会跳转到本系统的页面上进行操作，实际场景中更多的是手机端进行页面跳转，但也可以PC端网页版跳转，因为M是基于spring-mvc提供的能力（这是对项目的通用认知，但某些关键的细节点并没有包含在里面，以至于在后续问题分析中走了很多弯路，耗时2天半才定位到问题）。</p>
+<p>二、问题现象<br>    业务运行过程中，外部商户吐槽声来了，为什么跳转到你们的页面那么慢，耗时3-4s甚至更久，且频次比较高（后经运维部门同时查看，发现超过10%的请求出现慢的情况）。由于外部商户是移动端app，因此业务跳转耗时3-4s反馈到用户那儿的便于点击确认操作后白板3-4s。这确实是一个糟糕的用户体验！另，据相关小伙伴反映，这是一个由来已久的问题，只是以前业务少，而且是自己的前端业务部门使用，有时忍忍就过去了。（这儿提到这一点，因为，如果能证实以前的慢和现在的慢问题一样，那么可以推导出并不是新的改动后其他操作带来的新问题，这对问题定位有指导性意义，但分析问题时总归是仓促的，这些信息极容易被丢掉）。</p>
+<p>三、业务描述<br>    为了阐述问题的分析过程，业务场景必须清晰，下面简介一下该业务场景：</p>
+<p><img src="\images\pasted-88.png" alt="upload successful"></p>
+<p>四、问题排查<br>    通过前面的描述，我们知道了业务场景、系统情况及问题现象，接下来，我们开始了问题排查的过程，这过程，是痛苦的！！！<br>a、首先，我们跟进商户提供的流水号进行日志查询，发现商户请求的时间和我们底层系统M实际收到的时间确实相差了3-4s，于是，我们找到了入口系统Api，因为整个业务场景，是由Api进行的页面跳转，会不会是Api做了什么事，导致页面跳转慢了？<br>b、通过查询Api的日志，发现收到请求的时间确实和商户时间一致，我们似乎找到问题根源，即Api有问题，但当进一步排查时，发现Api和M的交互只是做了简单的302重定向，并无其他逻辑，且发现Api发起重定向的时间到M“接收”到请求便耗时了3-4s，于是，我们把矛头执行了网络问题，加之跳转过程是用的域名跳转，我们更深信这3-4s花在了网络上！<br>c、我们怀疑是否是网络问题，于是找到运维的小伙伴，一通排查，回复我们网络没问题，并给了我们ng日志<br><img src="\images\pasted-89.png" alt="upload successful"><br>d、这个回复让我们不甘心，因为我们的Api正常的发起了跳转请求，我们的M3-4s后才接收到请求，那这耗时一定是在网络上啊，并多次反复追问信息中心域名等相关网络问题，后来，我通过PC页面直接进行测试（因为我也是该产品的用户），当我一顿操作并点击确认按钮后，咦，很快呀，接着我反复的重试、刷新、重试，果不其然偶尔出现了一笔3-4s的耗时，看来这真是偶尔出现呀（新那这不应该是应用问题呀），紧接着我事用谷歌浏览器看了请求情况，发现如下信息：<br><img src="\images\pasted-90.png" alt="upload successful">，咦，这耗时花在了TTFB上面呀，然后百度一查，TTFB包含了tcp握手时间即服务端返回第一个字节的时间。哦，那这不正说明了网络问题嘛！同时我发现处理页面偶尔慢，某些纯后台服务或者图片也慢呀，于是又找到了运维同事，这已经大半天过去了（虽然中间处理问题断断续续）<br>e、这时，运维同事按照我们的方式测试，也确实出现了偶尔慢，他们抓包分析，发现当前网络正常呀，但有一个现象，慢的请求有三次重复ACK的现象，这是什么鬼？运维同事说这是正常的，TCP包乱序会重复发起ACK嘛，我将信将疑，但问题没说通啊，为什么慢，一小时过去了。这时更多的同事加入到问题分析，运维小伙伴为证明不是网络问题，在线上服务器直接ip访问页面，发现，也会出现慢，于是，我们也选择相信了网络没问题，但问题是什么？<br>f、这时我们测试过程中，又发现了某些图片资源404，某些图片资源即使存在但偶尔会慢，咦，是不是因为页面访问了资源而资源慢导致页面慢？这时其实问题的分析稍有偏差了，因为d的时候已经出现过类似问题，但没有包含资源的纯后台页面也慢啊！但花了近一天的分析，实在是太困惑，于是我们朝着这个方向去了。<br>g、我们把也慢扣了出来，并扔到了ng上，既然图片资源慢，我们改动页面，以至于后面仅仅是一个文本页面了，确实，访问不慢了（但前面说了，这已经偏离了，因为页面位于ng中，而不是项目中，但这也是分析的必经之地，因为这儿确实也存在问题），我们尝试加上css、js资源，慢又出现了，并且发现都是图表慢，但，这不应该了CDN上静态资源应该很快呀，但后面我们发现这些慢的图片并不位于CDN，而是在项目M中，同时也存在访问了CDN上不存在且并不需要依赖的资源。我们把图片映射做了一下ng映射（前面说的这是在ng上的页面），再次访问，正常了。于是结论出来了，至少，前端开发中，动静分离不合规，同时copy代码，无用的资源访问也出现了。这是今天耗时一天的分析结论。但。<br>h、第二天，上班后，按照昨日的分析，前端进行了标准化的优化，上线，但问题依旧（毕竟前面图片这个问题是问题，但不是这次问题的根本问题）。这时，大家伙都很无语了，不知道为什么了！运维小伙伴又将纯文本页面扔到M项目中，启动访问，发现，也会慢呀，什么情况！同时，相同页面单独扔到tomcat中启动就正常，哎，见鬼了。似乎无下文了。<br>i、这时M系统负责人突然说到，测试环境能重现慢的问题，（我似乎看到了一丝曙光），但本地启动没问题（这个。。。），，难道还是环境问题？我来到测试环境测试中，看着业务日志与gc日志，发现每次慢的时候就会做一次gc回收，咦，内存有问题？（实际是因为测试环境内存小，512M堆大小），但我又发现线上gc正常啊，但一点蛛丝马迹都得一试，把线上1.5G堆调成了4G堆，不过，问题依旧啊，似乎还慢的更频繁的样子（还是基于http访问又硬件负载均衡，正常业务跑步进来）。<br>j、心有不甘，但想着能重现问题，应该就能定位到问题，于是我开始了代码分析之路，和其他小伙伴从两个方向并行去分析，都耗时一天半了，心想着，两个思路一起搞，兴许快点。既然测试环境能重现，好吧，我试试本地是不是真重现不了，我打卡idea启动M，一顿尝试，好像真不可以呢。但我debug到了请求执行的环节，那，好吧，开启debug日志在测试环境看看，是哪个环节慢了？基于warn日志级别重启测试环境M，然后测试，发现，咦，真是的业务系统自己慢呢，已经收到请求了，在某个环节慢，而且，把页面扔到其他系统进行访问确没问题：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line">2019-07-05 19:05:38.955 DEBUG [http-nio-8004-exec-3] InternalNioInputBuffer:180-- Received [GET /creditCard/cardBinInfo.json HTTP/1.1</span><br><span class="line">Host: 192.168.46.3:8004</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Encoding: gzip, deflate, sdch</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.8</span><br><span class="line">Cookie: _csrf=c25ca56a-799f-4e23-b179-b09abaf7fa0e; cavyboss-session=40c8e4d0-0d09-4952-8812-93a1f44b0068; mpay-session=0714ad72-0e83-43d9-8b87-b002c34a71f3</span><br><span class="line"></span><br><span class="line">]</span><br><span class="line">2019-07-05 19:05:38.956 DEBUG [http-nio-8004-exec-3] CoyoteAdapter:180-- The variable [uriBC] has value [/creditCard/cardBinInfo.json]</span><br><span class="line">2019-07-05 19:05:38.957 DEBUG [http-nio-8004-exec-3] CoyoteAdapter:180-- The variable [semicolon] has value [-1]</span><br><span class="line">2019-07-05 19:05:38.957 DEBUG [http-nio-8004-exec-3] CoyoteAdapter:180-- The variable [enc] has value [utf-8]</span><br><span class="line">2019-07-05 19:05:42.640 DEBUG [http-nio-8004-exec-3] LegacyCookieProcessor:180-- Cookies: Parsing b[]: _csrf=c25ca56a-799f-4e23-b179-b09abaf7fa0e; cavyboss-session=40c8e4d0-0d09-4952-8812-93a1f44b0068; mpay-session=0714ad72-0e83-43d9-8b87-b002c34a71f3</span><br><span class="line">2019-07-05 19:05:42.643 DEBUG [http-nio-8004-exec-3] CoyoteAdapter:180--  Requested cookie session id is 0714ad72-0e83-43d9-8b87-b002c34a71f3</span><br><span class="line">2019-07-05 19:05:42.645 DEBUG [http-nio-8004-exec-3] RemoteIpValve:180-- Incoming request /creditCard/cardBinInfo.json with originalRemoteAddr &apos;192.168.47.152&apos;, originalRemoteHost=&apos;192.168.47.152&apos;, originalSecure=&apos;false&apos;, originalScheme=&apos;http&apos; will be seen as newRemoteAddr=&apos;192.168.47.152&apos;, newRemoteHost=&apos;192.168.47.152&apos;, newScheme=&apos;http&apos;, newSecure=&apos;false&apos;</span><br><span class="line">2019-07-05 19:05:42.645 DEBUG [http-nio-8004-exec-3] AuthenticatorBase:180-- Security checking request GET /creditCard/cardBinInfo.json</span><br><span class="line">2019-07-05 19:05:42.646 DEBUG [http-nio-8004-exec-3] RealmBase:180--   No applicable constraints defined</span><br><span class="line">2019-07-05 19:05:42.646 DEBUG [http-nio-8004-exec-3] AuthenticatorBase:180--  Not subject to any constraint</span><br><span class="line">2019-07-05 19:05:42.653 DEBUG [http-nio-8004-exec-3] OrderedRequestContextFilter:114-- Bound request context to thread: org.springframework.session.web.http.SessionRepositoryFilter$SessionRepositoryRequestWrapper@5edc7f61</span><br><span class="line">2019-07-05 19:05:42.654 DEBUG [http-nio-8004-exec-3] DispatcherServlet:863-- DispatcherServlet with name &apos;dispatcherServlet&apos; processing GET request for [/creditCard/cardBinInfo.json]</span><br><span class="line">2019-07-05 19:05:42.655 DEBUG [http-nio-8004-exec-3] Parameters:180-- Set encoding to UTF-8</span><br><span class="line">2019-07-05 19:05:42.660 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.663 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.663 DEBUG [http-nio-8004-exec-3] EndpointHandlerMapping:301-- Looking up handler method for path /creditCard/cardBinInfo.json</span><br><span class="line">2019-07-05 19:05:42.671 DEBUG [http-nio-8004-exec-3] EndpointHandlerMapping:311-- Did not find handler method for [/creditCard/cardBinInfo.json]</span><br><span class="line">2019-07-05 19:05:42.671 DEBUG [http-nio-8004-exec-3] RequestMappingHandlerMapping:301-- Looking up handler method for path /creditCard/cardBinInfo.json</span><br><span class="line">2019-07-05 19:05:42.692 DEBUG [http-nio-8004-exec-3] RequestMappingHandlerMapping:308-- Returning handler method [public java.lang.Object com.yiji.mobilepay.web.controller.CreditCardWithdrawControler.cardBinInfo(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse,javax.servlet.http.HttpSession)]</span><br><span class="line">2019-07-05 19:05:42.692 DEBUG [http-nio-8004-exec-3] DefaultListableBeanFactory:251-- Returning cached instance of singleton bean &apos;creditCardWithdrawControler&apos;</span><br><span class="line">2019-07-05 19:05:42.693 DEBUG [http-nio-8004-exec-3] DispatcherServlet:949-- Last-Modified value for [/creditCard/cardBinInfo.json] is: -1</span><br><span class="line">2019-07-05 19:05:42.704 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.704 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.831 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResources(META-INF/services/com.alibaba.fastjson.serializer.AutowiredObjectSerializer)</span><br><span class="line">2019-07-05 19:05:42.841 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.842 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.844 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.844 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.847 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.848 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.848 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.849 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.849 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.849 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.862 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findClass(com.yjf.common.lang.result.ViewResultInfoBeanInfo)</span><br><span class="line">2019-07-05 19:05:42.862 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Returning ClassNotFoundException</span><br><span class="line">2019-07-05 19:05:42.866 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findClass(com.yjf.common.lang.result.ViewResultInfoCustomizer)</span><br><span class="line">2019-07-05 19:05:42.867 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Returning ClassNotFoundException</span><br><span class="line">2019-07-05 19:05:42.869 DEBUG [dubbo-remoting-client-heartbeat-thread-1] HeartBeatTask:66--  [DUBBO] Send heartbeat to remote channel /192.168.46.3:20917, cause: The channel has no data-transmission exceeds a heartbeat period: 60000ms</span><br><span class="line">2019-07-05 19:05:42.870 DEBUG [New I/O client worker #1-3] HeartbeatHandler:82--  [DUBBO] Receive heartbeat response in thread New I/O client worker #1-3</span><br><span class="line">2019-07-05 19:05:42.874 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(Object.class)</span><br><span class="line">2019-07-05 19:05:42.874 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.875 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(Object.class)</span><br><span class="line">2019-07-05 19:05:42.876 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.876 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.877 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(String.class)</span><br><span class="line">2019-07-05 19:05:42.878 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.879 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(String.class)</span><br><span class="line">2019-07-05 19:05:42.879 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.880 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.881 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(StringBuilder.class)</span><br><span class="line">2019-07-05 19:05:42.882 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.883 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(StringBuilder.class)</span><br><span class="line">2019-07-05 19:05:42.883 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.884 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.887 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(com.class)</span><br><span class="line">2019-07-05 19:05:42.887 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.888 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(com.class)</span><br><span class="line">2019-07-05 19:05:42.889 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.889 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.890 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(java/lang/com.class)</span><br><span class="line">2019-07-05 19:05:42.891 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.892 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(java/lang/com.class)</span><br><span class="line">2019-07-05 19:05:42.892 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.893 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.894 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(com/yjf.class)</span><br><span class="line">2019-07-05 19:05:42.894 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.895 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(com/yjf.class)</span><br><span class="line">2019-07-05 19:05:42.896 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.896 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.897 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(com/yjf/common.class)</span><br><span class="line">2019-07-05 19:05:42.898 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.899 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(com/yjf/common.class)</span><br><span class="line">2019-07-05 19:05:42.899 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.900 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.901 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180-- getResource(com/yjf/common/util.class)</span><br><span class="line">2019-07-05 19:05:42.901 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   Delegating to parent classloader org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line">2019-07-05 19:05:42.902 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     findResource(com/yjf/common/util.class)</span><br><span class="line">2019-07-05 19:05:42.903 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--     --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.903 DEBUG [http-nio-8004-exec-3] WebappClassLoaderBase:180--   --&gt; Resource not found, returning null</span><br><span class="line">2019-07-05 19:05:42.908 DEBUG [http-nio-8004-exec-3] ToString:550-- classloader:TomcatEmbeddedWebappClassLoader</span><br><span class="line">  context: ROOT</span><br><span class="line">  delegate: true</span><br><span class="line">----------&gt; Parent Classloader:</span><br><span class="line">org.springframework.boot.loader.LaunchedURLClassLoader@11a9e7c8</span><br><span class="line"></span><br><span class="line">2019-07-05 19:05:42.910 DEBUG [http-nio-8004-exec-3] RequestResponseBodyMethodProcessor:225-- Written [ViewResultInfo&#123;code=null,data=null,message=请通过网页正常步骤进行访问或者系统已超时,success=false&#125;] as &quot;application/json;charset=UTF-8&quot; using [com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter@3220bfbc]</span><br><span class="line">2019-07-05 19:05:42.911 DEBUG [http-nio-8004-exec-3] DispatcherServlet:1036-- Null ModelAndView returned to DispatcherServlet with name &apos;dispatcherServlet&apos;: assuming HandlerAdapter completed request handling</span><br><span class="line">2019-07-05 19:05:42.911 DEBUG [http-nio-8004-exec-3] DispatcherServlet:997-- Successfully completed request</span><br><span class="line">2019-07-05 19:05:42.911 DEBUG [http-nio-8004-exec-3] OrderedRequestContextFilter:104-- Cleared thread-bound request context: org.springframework.session.web.http.SessionRepositoryFilter$SessionRepositoryRequestWrapper@5edc7f61</span><br><span class="line">2019-07-05 19:05:42.912 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.912 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.912 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.913 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br><span class="line">2019-07-05 19:05:42.913 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:125-- Opening RedisConnection</span><br><span class="line">2019-07-05 19:05:42.913 DEBUG [http-nio-8004-exec-3] RedisConnectionUtils:205-- Closing Redis Connection</span><br></pre></td></tr></table></figure></p>
+<p>但是，这个环节去干什么了呢？源代码日志很少，看不出来呀！难道是分布式session问题，发现springboot分布式session我们内部事用redis实现的，后经一顿排查，发现上面日志中已经包含了redis的操作，但是是在慢的那个环节之后呀（不过提了个醒，以后redis要是抽风，这也是个风险点呢）。<br>k、现在知道问题就出在org.apache.catalina.connector.CoyoteAdapter这个类日志中显示的慢的那个环节了，但他究竟干了什么？貌似只是简单的一些操作啊，代码层次很深，今天也疲惫了，就没往深处看，为什么本地测试不出现问题？带着这些疑问，今天收班了。<br>l、今天没来是周六，但问题没解决，心有不甘呀，而且都能重现问题了，要是不定位到，好可惜。于是背着包来到了公司，反正今日无安排！来到公司，经过作为和今早放松了大脑，有准备整装待发了。本地不出问题，难道是打包环节不一样？两个私服不一致?于是我把测试环境的jar包拷了下来，java XXX -jar启动，咦，本地重现问题了！真是私服问题，包版本不一致？我又把本地项目用另一个私服打了jar包java XXX -jar启动，咦，问题也重现了，哦！原来是idea启动时候和java -jar有些区别，也许是classpath加载的区别吧，此处没深究，但很庆幸，本地重现问题，离问题定位再进一步<br>m、既然本地都重现问题了，虽然不能用idea断点测试，但我改改源码加加日志吧。ok！源码日志已加号，这下日志详细了吧，java XXX -jar启动，测试，啊！原来是这慢，还以为只是简单的map呢，被类没迷惑了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">2019-07-06 11:44:55.430 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- normaliztion start............................</span><br><span class="line">2019-07-06 11:44:55.430 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- normaliztion end............................</span><br><span class="line">2019-07-06 11:44:55.432 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- decodedURI start............................</span><br><span class="line">2019-07-06 11:44:55.432 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- decodedURI end............................</span><br><span class="line">2019-07-06 11:44:55.432 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check normaliztion start............................</span><br><span class="line">2019-07-06 11:44:55.432 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check normaliztion end............................</span><br><span class="line">2019-07-06 11:44:55.433 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check getUseIPVHosts start............................&#123;&#125;false</span><br><span class="line">2019-07-06 11:44:55.433 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check getUseIPVHosts end............................&#123;&#125;localhost</span><br><span class="line">2019-07-06 11:44:55.433 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check mapreu start............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.570 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check mapreu end............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.570 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check session start1............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.570 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check session start4............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.571 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check session start5............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.571 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check session start6............................&#123;&#125;</span><br><span class="line">2019-07-06 11:45:00.571 INFO  [http-nio-8004-exec-13] CoyoteAdapter:180-- check session start7............................&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>源码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// This will map the the latest version by default</span><br><span class="line">            connector.getService().getMapper().map(serverName, decodedURI,</span><br><span class="line">                    version, request.getMappingData());</span><br></pre></td></tr></table></figure></p>
+<p>此时内心激动，问题似乎更清晰了，打开idea，断点测试，往里面跟，发现了一个gateway页面，咦，这时我们定义的页面，全项目搜索一下，它干啥了！<br>源码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// Rule 1 -- Exact Match</span><br><span class="line">       MappedWrapper[] exactWrappers = contextVersion.exactWrappers;</span><br><span class="line">       internalMapExactWrapper(exactWrappers, path, mappingData);</span><br><span class="line"></span><br><span class="line">       // Rule 2 -- Prefix Match</span><br><span class="line">       boolean checkJspWelcomeFiles = false;</span><br><span class="line">       MappedWrapper[] wildcardWrappers = contextVersion.wildcardWrappers;</span><br><span class="line">       if (mappingData.wrapper == null) &#123;</span><br><span class="line">           internalMapWildcardWrapper(wildcardWrappers, contextVersion.nesting,</span><br><span class="line">                                      path, mappingData);</span><br></pre></td></tr></table></figure></p>
+<p>包含gateway的代码：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">public class StargateConfigration &#123;</span><br><span class="line">	@Bean</span><br><span class="line">	public ServletRegistrationBean dispatcherRegistration(StargateDispachServlet stargateDispachServlet) &#123;</span><br><span class="line">	    ServletRegistrationBean registration = new ServletRegistrationBean(</span><br><span class="line">	    		stargateDispachServlet);</span><br><span class="line">	    registration.addUrlMappings(&quot;/gateway&quot;);</span><br><span class="line">	    return registration;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure></p>
+<p>咦，servlet，我顿时想起以前好像我们的spring-boot专门做了堆jsp的支持，于是来到我们的tomcat-staters，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">@Bean(name = &quot;yijiEmbeddedServletContainerCustomizer&quot;)</span><br><span class="line">public EmbeddedServletContainerCustomizer embeddedServletContainerCustomizer() &#123;</span><br><span class="line">	</span><br><span class="line">	return container -&gt; &#123;</span><br><span class="line">		//1. disable jsp if possible</span><br><span class="line">		if (!tomcatProperties.getJsp().isEnable()) &#123;</span><br><span class="line">			JspServlet jspServlet = new JspServlet();</span><br><span class="line">			jspServlet.setRegistered(false);</span><br><span class="line">			container.setJspServlet(jspServlet);</span><br><span class="line">		&#125;</span><br></pre></td></tr></table></figure></p>
+<p>难道是M系统启用了yiji.tomcat.jsp.enable=true？通过线上系统变量搜索，发现，确实，M启用了，其他系统没有，恍然大悟，这就是为什么M有问题而其他系统没问题的原因吧！于是我java -Dyiji.tomcat.jsp.enable=false -jar M，测试，果然，不慢了。。。问题终于定位到，spring-boot本身不推荐jsp，但提供了支持，这说明本身支持的方式就存在性能问题！<br>n、嗯，接下来，下掉jsp吧，本来这就是遗留问题，传统项目采用jsp，切换springboot后强行支持了jsp，但却有性能问题！还有安全漏洞！</p>
+<p>下面说说spring-boot如何支持jsp吧。其实就是多注册一个JspServlet!<br>1、添加依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;</span><br><span class="line">            &lt;scope&gt;provided&lt;/scope&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br><span class="line">        &lt;dependency&gt;</span><br><span class="line">            &lt;groupId&gt;javax.servlet&lt;/groupId&gt;</span><br><span class="line">            &lt;artifactId&gt;jstl&lt;/artifactId&gt;</span><br><span class="line">        &lt;/dependency&gt;</span><br></pre></td></tr></table></figure></p>
+<p>2、配置文件中指定jsp文件存放路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#路径,在webapp文件夹下新建文件夹WEB-INF,在往下建文件夹jsp</span><br><span class="line">spring.mvc.view.prefix=/WEB-INF/jsp/</span><br><span class="line">#文件名的后缀,例如:index.jsp,放在jsp文件夹下</span><br><span class="line">spring.mvc.view.suffix=.jsp</span><br></pre></td></tr></table></figure></p>
+<p><img src="\images\pasted-91.png" alt="upload successful"><br>3、作为框架，我们默认不支持jsp，因为有性能损耗<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if (!tomcatProperties.getJsp().isEnable()) &#123;</span><br><span class="line">				JspServlet jspServlet = new JspServlet();</span><br><span class="line">				jspServlet.setRegistered(false);</span><br><span class="line">				container.setJspServlet(jspServlet);</span><br><span class="line">			&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4、业务系统根据自身情况决定是否启动jsp支持，启用，意味着接受性能损耗！</p>
+<p>心得：<br>  本地问题分析历史2天半（中途很多时间在处理其他事情），心理感受颇多，分析线上类似问题一定要思路清晰，先网路再应用，另外一定要有主线，如果能本地重现问题，那可是天大的耗时，源码跟踪，源码添加日志可有效帮我们分析问题，总之，分析跨系统、跨部门、框架级问题时，心态很重要！</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/这些年，那些坑/" rel="tag"># 这些年，那些坑</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/05/ava-lang-NoClassDefFoundError-Could-not-initialize-class/" rel="next" title="java.lang.NoClassDefFoundError: Could not initialize class">
+                <i class="fa fa-chevron-left"></i> java.lang.NoClassDefFoundError: Could not initialize class
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">51</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/realxc" title="GitHub &rarr; https://github.com/realxc" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="/709257360@qq.com@gmail.com" title="E-Mail &rarr; 709257360@qq.com@gmail.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+  
+  
+
+
+
+  
+  
+
+
+
+  
+  
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/three/three.min.js"></script>
+
+  
+  <script src="/lib/three/three-waves.min.js"></script>
+
+  
+  <script src="/lib/three/canvas_lines.min.js"></script>
+
+  
+  <script src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
