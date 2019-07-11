@@ -371,6 +371,176 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/07/11/mysql数据库wait-timeout问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/07/11/mysql数据库wait-timeout问题/" class="post-title-link" itemprop="url">mysql数据库wait_timeout问题</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-11 14:59:00 / 修改时间：15:18:55" itemprop="dateCreated datePublished" datetime="2019-07-11T14:59:00+08:00">2019-07-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>背景：近日与猪方合作一项目，项目交付后，对方反馈测试环境老是出现数据库异常（下面给出堆栈日志），并且对方的其他应用没有问题。但交付前，此项目在我们的环境（代码、数据库等都是我们的）中测试并无问题。</p>
+<p>问题现象：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">at java.lang.Thread.run(Thread.java:748)</span><br><span class="line">Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure</span><br><span class="line"></span><br><span class="line">The last packet successfully received from the server was 56,397 milliseconds ago.  The last packet sent successfully to the server was 0 milliseconds ag</span><br><span class="line">o.</span><br><span class="line">        at sun.reflect.GeneratedConstructorAccessor47.newInstance(Unknown Source)</span><br><span class="line">        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)</span><br><span class="line">        at java.lang.reflect.Constructor.newInstance(Constructor.java:423)</span><br><span class="line">        at com.mysql.jdbc.Util.handleNewInstance(Util.java:404)</span><br><span class="line">        at com.mysql.jdbc.SQLError.createCommunicationsException(SQLError.java:981)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:3465)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:3365)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:3805)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2478)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2625)</span><br><span class="line">        at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2547)</span><br><span class="line">        at com.mysql.jdbc.ConnectionImpl.setAutoCommit(ConnectionImpl.java:4874)</span><br><span class="line">        at com.alibaba.druid.pool.DruidPooledConnection.setAutoCommit(DruidPooledConnection.java:712)</span><br><span class="line">        at org.springframework.jdbc.datasource.DataSourceTransactionManager.doBegin(DataSourceTransactionManager.java:225)</span><br><span class="line">        ... 45 common frames omitted</span><br><span class="line">Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.readFully(MysqlIO.java:2957)</span><br><span class="line">        at com.mysql.jdbc.MysqlIO.reuseAndReadPacket(MysqlIO.java:3375)</span><br><span class="line">        ... 53 common frames omitted</span><br><span class="line">2019-07-11 13:41:00.311 [TxId:test_1562754979799^1562754982427^117,SpanId:2404734433174193776] [INFO ] c.z.c.p.b.a.i.w.WithdrawTransImpl:116 - 查询交易结</span><br><span class="line">束TradeQueryResult [sucAmount=0, transDate=null]</span><br><span class="line">2019-07-11 13:42:47.097 [TxId:,SpanId:] [INFO ] c.z.c.c.a.r.DefaultRealtimeMonitor:52 - realtime monitor request end, api server return message : LOOP</span><br><span class="line">2019-07-11 13:42:47.097 [TxId:,SpanId:] [INFO ] c.z.c.c.a.r.DefaultRealtimeMonitor:49 - realtime monitor request begin, url -&gt; http://api.config.zhubajie</span><br><span class="line">.la/realtime/pull</span><br><span class="line">2019-07-11 13:44:00.415 [TxId:192.168.25.11.1015^1561538402946^21456,Span</span><br></pre></td></tr></table></figure></p>
+<p>看到这段日志，我注意到“Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: Communications link failure The last packet successfully received from the server was 56,397 milliseconds ago.  The last packet sent successfully to the server was 0 milliseconds ag<br>o.”， 56397毫秒，这个数字很扎眼！！！ 因为我们使用的druid连接池，最小生存时间和需要关闭的空闲连接时间都是60s，说明了一个问题，所拿到的连接未超过60s，所以仍在连接池中，但是该连接貌似是失效了。分析到这儿，我猜测猪方mysql数据库的wait_timeout估计是进行了修改且小于56.397秒（默认是8小时，我们工时使用默认值），于是来到猪方的数据库，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">show global variables like &apos;%timeout&apos;;</span><br><span class="line">connect_timeout	10</span><br><span class="line">delayed_insert_timeout	300</span><br><span class="line">have_statement_timeout	YES</span><br><span class="line">innodb_flush_log_at_timeout	1</span><br><span class="line">innodb_lock_wait_timeout	120</span><br><span class="line">innodb_rollback_on_timeout	OFF</span><br><span class="line">interactive_timeout	30</span><br><span class="line">lock_wait_timeout	31536000</span><br><span class="line">net_read_timeout	5</span><br><span class="line">net_write_timeout	5</span><br><span class="line">rpl_semi_sync_master_timeout	10000</span><br><span class="line">rpl_stop_slave_timeout	31536000</span><br><span class="line">slave_net_timeout	60</span><br><span class="line">thread_pool_idle_timeout	60</span><br><span class="line">tokudb_last_lock_timeout	</span><br><span class="line">tokudb_lock_timeout	4000</span><br><span class="line">wait_timeout	30</span><br></pre></td></tr></table></figure></p>
+<p>好吧，猜想正确，他们讲wait_timeout设置成了30s。</p>
+<p>同时他们自己的连接池配置是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dataSource.setTimeBetweenEvictionRunsMillis(5000);</span><br><span class="line">dataSource.setMinEvictableIdleTimeMillis(30000);</span><br></pre></td></tr></table></figure></p>
+<p>而我们的连接池配置是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dataSource.setTimeBetweenEvictionRunsMillis(60000);</span><br><span class="line">dataSource.setMinEvictableIdleTimeMillis(60000);</span><br></pre></td></tr></table></figure></p>
+<p>问题解决！！！</p>
+<p>关于wait_timeout，这个参数到底要不要重新设置值没有固定的标准，保障数据库的可用性和性能即可，但应用层必须根据wait_timeout的实际情况进行相应的配置：<br>1、最大空闲时间不能大于wait_timeout<br>2、可以尝试在数据库连接中增加autoReconnect=true<br>3、testWhileIdle=”true” timeBetweenEvictionRunsMillis=”10000” validationQuery=”select 1”</p>
+<p>猪方连接池：<br><img src="\images\pasted-92.png" alt="upload successful"><br>我方连接池：</p>
+<p><img src="\images\pasted-94.png" alt="upload successful"></p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/07/08/spring-boot1-3-5支持jsp导致浏览器访问应用偶尔慢/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1906,149 +2076,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/08/谈一谈锁/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/08/谈一谈锁/" class="post-title-link" itemprop="url">谈一谈锁</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-08 22:11:18" itemprop="dateCreated datePublished" datetime="2019-04-08T22:11:18+08:00">2019-04-08</time>
-            
-
-            
-          </span>
-
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2090,7 +2122,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-count">41</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
