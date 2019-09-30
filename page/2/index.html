@@ -371,182 +371,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/09/G1垃圾回收器-xx-initiatingheapoccupancypercent变量之问/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Xiang Chuang">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="博客园-向闯">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/09/G1垃圾回收器-xx-initiatingheapoccupancypercent变量之问/" class="post-title-link" itemprop="url">G1- --xx:initiatingheapoccupancypercent变量之问</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-09 22:24:00" itemprop="dateCreated datePublished" datetime="2019-04-09T22:24:00+08:00">2019-04-09</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/爱学爱问/" itemprop="url" rel="index"><span itemprop="name">爱学爱问</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>问题：该变量究竟何意？<br>官方解释<br><img src="\images\pasted-0.png" alt="upload successful"></p>
-<p>疑问：整堆占用率，到底是老年代区域占用整堆比率还是所有区域占用整堆比率？<br>个人认为应该是老年代占用区域<br>原因：<br>1、新生代默认比例为5-60%， 新生代的回收是使用殆尽时，那么，本文讨论的这个变量默认时45%，这两个是用一点冲突的<br>2、工作内存调优时发现gc日志，报出占用率超过45%时，此时更像是老年代超过45%<br>3、工作内存调优过程：<br>mpay堆大小 1500多兆，堆内存使用率预警值90%<br>a、最初时候出现预警时 堆内存占用率时 1500<em>60% + ？ = 1500M左右 即，差不多用光了； 时常预警<br>b、后来调成 1500</em>25% + ？=1000M左右； 没有再预警<br>c、再后来调成 1500*45% + ？ = 1350M左右 很少出现<br>【？】处是老年代的占比，  如果用45%来计算，才能符合我们的现象。</p>
-<p>a、 最初时候出现预警时 堆内存占用率时 1500<em>60% + 1500</em>45% ；<br>b、后来调成 1500<em>25% + 1500</em>45%=975M ；<br>c、再后来调成 1500<em>45% + 1500</em>45% = 1350M</p>
-<p>附：GC日志记录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br></pre></td><td class="code"><pre><span class="line">2019-04-08T22:58:18.594+0800: 45124.782: [GC pause (G1 Evacuation Pause) (young) 45124.783: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 13273, predicted base time: 26.68 ms, remaining time: 23.32 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45124.783: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 664 regions, survivors: 27 regions, predicted young region time: 15.56 ms]</span><br><span class="line"> 45124.783: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 664 regions, survivors: 27 regions, old: 0 regions, predicted pause time: 42.25 ms, target pause time: 50.00 ms]</span><br><span class="line">, 0.0195542 secs]</span><br><span class="line">   [Parallel Time: 9.5 ms, GC Workers: 8]</span><br><span class="line">      [GC Worker Start (ms): Min: 45124782.9, Avg: 45124783.1, Max: 45124783.3, Diff: 0.4]</span><br><span class="line">      [Ext Root Scanning (ms): Min: 2.7, Avg: 3.0, Max: 4.5, Diff: 1.8, Sum: 24.3]</span><br><span class="line">      [Update RS (ms): Min: 1.6, Avg: 2.8, Max: 3.4, Diff: 1.8, Sum: 22.3]</span><br><span class="line">         [Processed Buffers: Min: 1, Avg: 15.6, Max: 28, Diff: 27, Sum: 125]</span><br><span class="line">      [Scan RS (ms): Min: 0.0, Avg: 0.2, Max: 0.3, Diff: 0.3, Sum: 1.5]</span><br><span class="line">      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]</span><br><span class="line">      [Object Copy (ms): Min: 2.5, Avg: 2.8, Max: 3.0, Diff: 0.4, Sum: 22.0]</span><br><span class="line">      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]</span><br><span class="line">         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 8]</span><br><span class="line">      [GC Worker Other (ms): Min: 0.0, Avg: 0.1, Max: 0.3, Diff: 0.2, Sum: 1.0]</span><br><span class="line">      [GC Worker Total (ms): Min: 8.6, Avg: 8.9, Max: 9.2, Diff: 0.6, Sum: 71.2]</span><br><span class="line">      [GC Worker End (ms): Min: 45124791.9, Avg: 45124792.0, Max: 45124792.1, Diff: 0.2]</span><br><span class="line">   [Code Root Fixup: 0.3 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.8 ms]</span><br><span class="line">   [Other: 9.0 ms]</span><br><span class="line">      [Choose CSet: 0.0 ms]</span><br><span class="line">      [Ref Proc: 6.2 ms]</span><br><span class="line">      [Ref Enq: 0.4 ms]</span><br><span class="line">      [Redirty Cards: 0.3 ms]</span><br><span class="line">      [Humongous Register: 0.1 ms]</span><br><span class="line">      [Humongous Reclaim: 0.1 ms]</span><br><span class="line">      [Free CSet: 1.0 ms]</span><br><span class="line">   [Eden: 664.0M(664.0M)-&gt;0.0B(678.0M) Survivors: 27.0M-&gt;13.0M Heap: 1008.6M(1536.0M)-&gt;326.5M(1536.0M)]</span><br><span class="line"> [Times: user=0.09 sys=0.00, real=0.02 secs]</span><br><span class="line"> </span><br><span class="line"> 2019-04-08T22:58:48.854+0800: 45155.043: [GC pause (G1 Evacuation Pause) (young) 45155.043: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 12417, predicted base time: 23.87 ms, remaining time: 26.13 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45155.043: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 678 regions, survivors: 13 regions, predicted young region time: 9.44 ms]</span><br><span class="line"> 45155.043: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 678 regions, survivors: 13 regions, old: 0 regions, predicted pause time: 33.31 ms, target pause time: 50.00 ms]</span><br><span class="line">, 0.0211469 secs]</span><br><span class="line">   [Parallel Time: 12.1 ms, GC Workers: 8]</span><br><span class="line">      [GC Worker Start (ms): Min: 45155043.0, Avg: 45155043.2, Max: 45155043.3, Diff: 0.3]</span><br><span class="line">      [Ext Root Scanning (ms): Min: 2.1, Avg: 2.5, Max: 3.8, Diff: 1.7, Sum: 20.0]</span><br><span class="line">      [Update RS (ms): Min: 1.1, Avg: 2.1, Max: 2.4, Diff: 1.4, Sum: 16.7]</span><br><span class="line">         [Processed Buffers: Min: 9, Avg: 14.8, Max: 27, Diff: 18, Sum: 118]</span><br><span class="line">      [Scan RS (ms): Min: 0.0, Avg: 0.2, Max: 0.2, Diff: 0.2, Sum: 1.3]</span><br><span class="line">      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]</span><br><span class="line">      [Object Copy (ms): Min: 6.7, Avg: 6.8, Max: 6.9, Diff: 0.2, Sum: 54.8]</span><br><span class="line">      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]</span><br><span class="line">         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 8]</span><br><span class="line">      [GC Worker Other (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.1, Sum: 0.6]</span><br><span class="line">      [GC Worker Total (ms): Min: 11.5, Avg: 11.7, Max: 11.9, Diff: 0.4, Sum: 93.5]</span><br><span class="line">      [GC Worker End (ms): Min: 45155054.8, Avg: 45155054.8, Max: 45155054.9, Diff: 0.1]</span><br><span class="line">   [Code Root Fixup: 0.2 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.6 ms]</span><br><span class="line">   [Other: 8.3 ms]</span><br><span class="line">      [Choose CSet: 0.0 ms]</span><br><span class="line">      [Ref Proc: 5.7 ms]</span><br><span class="line">      [Ref Enq: 0.6 ms]</span><br><span class="line">      [Redirty Cards: 0.4 ms]</span><br><span class="line">      [Humongous Register: 0.1 ms]</span><br><span class="line">      [Humongous Reclaim: 0.2 ms]</span><br><span class="line">      [Free CSet: 0.7 ms]</span><br><span class="line">   [Eden: 678.0M(678.0M)-&gt;0.0B(660.0M) Survivors: 13.0M-&gt;31.0M Heap: 1260.8M(1536.0M)-&gt;527.7M(1536.0M)]</span><br><span class="line"> [Times: user=0.11 sys=0.00, real=0.03 secs]</span><br><span class="line"> </span><br><span class="line"> 45189.907: [G1Ergonomics (Concurrent Cycles) request concurrent cycle initiation, reason: occupancy higher than threshold, occupancy: 713031680 bytes, allocation request: 36578320 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45189.909: [G1Ergonomics (Concurrent Cycles) request concurrent cycle initiation, reason: requested by GC cause, GC cause: G1 Humongous Allocation]</span><br><span class="line"> 45189.909: [G1Ergonomics (Concurrent Cycles) initiate concurrent cycle, reason: concurrent cycle initiation requested]</span><br><span class="line">2019-04-08T22:59:23.721+0800: 45189.910: [GC pause (G1 Humongous Allocation) (young) (initial-mark) 45189.910: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 17533, predicted base time: 22.62 ms, remaining time: 27.38 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45189.910: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 625 regions, survivors: 31 regions, predicted young region time: 7.83 ms]</span><br><span class="line"> 45189.910: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 625 regions, survivors: 31 regions, old: 0 regions, predicted pause time: 30.45 ms, target pause time: 50.00 ms]</span><br><span class="line">, 0.0292182 secs]</span><br><span class="line">   [Parallel Time: 17.3 ms, GC Workers: 8]</span><br><span class="line">      [GC Worker Start (ms): Min: 45189910.8, Avg: 45189911.1, Max: 45189911.4, Diff: 0.6]</span><br><span class="line">      [Ext Root Scanning (ms): Min: 4.0, Avg: 4.2, Max: 4.7, Diff: 0.8, Sum: 33.8]</span><br><span class="line">      [Update RS (ms): Min: 3.6, Avg: 3.6, Max: 3.8, Diff: 0.2, Sum: 29.2]</span><br><span class="line">         [Processed Buffers: Min: 9, Avg: 18.8, Max: 26, Diff: 17, Sum: 150]</span><br><span class="line">      [Scan RS (ms): Min: 0.0, Avg: 0.2, Max: 0.2, Diff: 0.2, Sum: 1.4]</span><br><span class="line">      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]</span><br><span class="line">      [Object Copy (ms): Min: 7.7, Avg: 7.9, Max: 8.1, Diff: 0.4, Sum: 63.3]</span><br><span class="line">      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]</span><br><span class="line">         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 8]</span><br><span class="line">      [GC Worker Other (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.2, Sum: 1.0]</span><br><span class="line">      [GC Worker Total (ms): Min: 15.7, Avg: 16.1, Max: 16.3, Diff: 0.6, Sum: 128.8]</span><br><span class="line">      [GC Worker End (ms): Min: 45189927.2, Avg: 45189927.2, Max: 45189927.4, Diff: 0.2]</span><br><span class="line">   [Code Root Fixup: 0.4 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.7 ms]</span><br><span class="line">   [Other: 10.9 ms]</span><br><span class="line">      [Choose CSet: 0.1 ms]</span><br><span class="line">      [Ref Proc: 7.0 ms]</span><br><span class="line">      [Ref Enq: 0.5 ms]</span><br><span class="line">      [Redirty Cards: 0.5 ms]</span><br><span class="line">      [Humongous Register: 0.1 ms]</span><br><span class="line">      [Humongous Reclaim: 0.5 ms]</span><br><span class="line">      [Free CSet: 0.9 ms]</span><br><span class="line">   [Eden: 625.0M(660.0M)-&gt;0.0B(660.0M) Survivors: 31.0M-&gt;31.0M Heap: 1319.5M(1536.0M)-&gt;458.2M(1536.0M)]</span><br><span class="line"> [Times: user=0.14 sys=0.01, real=0.03 secs]</span><br><span class="line"> </span><br><span class="line"> 2019-04-08T22:59:23.751+0800: 45189.939: [GC concurrent-root-region-scan-start]</span><br><span class="line">2019-04-08T22:59:23.765+0800: 45189.953: [GC concurrent-root-region-scan-end, 0.0135482 secs]</span><br><span class="line">2019-04-08T22:59:23.765+0800: 45189.953: [GC concurrent-mark-start]</span><br><span class="line">2019-04-08T22:59:24.042+0800: 45190.231: [GC concurrent-mark-end, 0.2778332 secs]</span><br><span class="line">2019-04-08T22:59:24.045+0800: 45190.233: [GC remark 2019-04-08T22:59:24.045+0800: 45190.233: [Finalize Marking, 0.0013681 secs] 2019-04-08T22:59:24.046+0800: 45190.234: [GC ref-proc, 0.0093594 secs] 2019-04-08T22:59:24.056+0800: 45190.244: [Unloading, 0.0237148 secs], 0.0366644 secs]</span><br><span class="line"> [Times: user=0.21 sys=0.01, real=0.04 secs]</span><br><span class="line">2019-04-08T22:59:24.083+0800: 45190.271: [GC cleanup 506M-&gt;506M(1536M), 0.0063516 secs]</span><br><span class="line"> [Times: user=0.01 sys=0.00, real=0.00 secs]</span><br><span class="line"> 45199.221: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 708837376 bytes, allocation request: 23411104 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45199.822: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 732954624 bytes, allocation request: 524304 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45199.823: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 734003200 bytes, allocation request: 1048592 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45199.824: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 736100352 bytes, allocation request: 680584 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45207.963: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 737148928 bytes, allocation request: 47775760 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45208.497: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 785383424 bytes, allocation request: 23411104 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45209.189: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 809500672 bytes, allocation request: 524304 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45223.797: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 810549248 bytes, allocation request: 36578320 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line"> 45224.628: [G1Ergonomics (Concurrent Cycles) do not request concurrent cycle initiation, reason: still doing mixed collections, occupancy: 847249408 bytes, allocation request: 17922544 bytes, threshold: 724775715 bytes (45.00 %), source: concurrent humongous allocation]</span><br><span class="line">2019-04-08T22:59:58.442+0800: 45224.630: [GC pause (G1 Humongous Allocation) (young) 45224.630: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 18363, predicted base time: 22.47 ms, remaining time: 27.53 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45224.630: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 660 regions, survivors: 31 regions, predicted young region time: 7.16 ms]</span><br><span class="line"> 45224.630: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 660 regions, survivors: 31 regions, old: 0 regions, predicted pause time: 29.63 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45224.660: [G1Ergonomics (Mixed GCs) start mixed GCs, reason: candidate old regions available, candidate old regions: 187 regions, reclaimable: 102606088 bytes (6.37 %), threshold: 5.00 %]</span><br><span class="line">, 0.0300491 secs]</span><br><span class="line">[Parallel Time: 16.3 ms, GC Workers: 8]</span><br><span class="line">      [GC Worker Start (ms): Min: 45224630.8, Avg: 45224631.1, Max: 45224631.3, Diff: 0.6]</span><br><span class="line">      [Ext Root Scanning (ms): Min: 2.6, Avg: 2.9, Max: 4.3, Diff: 1.7, Sum: 23.6]</span><br><span class="line">      [Update RS (ms): Min: 3.0, Avg: 3.9, Max: 4.2, Diff: 1.1, Sum: 30.8]</span><br><span class="line">         [Processed Buffers: Min: 11, Avg: 18.0, Max: 26, Diff: 15, Sum: 144]</span><br><span class="line">      [Scan RS (ms): Min: 0.0, Avg: 0.2, Max: 0.3, Diff: 0.2, Sum: 1.6]</span><br><span class="line">      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.0, Sum: 0.2]</span><br><span class="line">      [Object Copy (ms): Min: 8.2, Avg: 8.4, Max: 8.6, Diff: 0.4, Sum: 67.5]</span><br><span class="line">      [Termination (ms): Min: 0.0, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.7]</span><br><span class="line">         [Termination Attempts: Min: 1, Avg: 1.0, Max: 1, Diff: 0, Sum: 8]</span><br><span class="line">      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.0, Sum: 0.4]</span><br><span class="line">      [GC Worker Total (ms): Min: 15.3, Avg: 15.6, Max: 15.9, Diff: 0.6, Sum: 124.6]</span><br><span class="line">      [GC Worker End (ms): Min: 45224646.7, Avg: 45224646.7, Max: 45224646.7, Diff: 0.1]</span><br><span class="line">   [Code Root Fixup: 0.3 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.7 ms]</span><br><span class="line">   [Other: 12.8 ms]</span><br><span class="line">      [Choose CSet: 0.0 ms]</span><br><span class="line">      [Ref Proc: 7.7 ms]</span><br><span class="line">      [Ref Enq: 0.6 ms]</span><br><span class="line">      [Redirty Cards: 1.0 ms]</span><br><span class="line">      [Humongous Register: 0.2 ms]</span><br><span class="line">      [Humongous Reclaim: 0.6 ms]</span><br><span class="line">      [Free CSet: 1.7 ms]</span><br><span class="line">   [Eden: 660.0M(660.0M)-&gt;0.0B(45.0M) Survivors: 31.0M-&gt;31.0M Heap: 1479.4M(1536.0M)-&gt;630.5M(1536.0M)]</span><br><span class="line"> [Times: user=0.15 sys=0.01, real=0.03 secs]</span><br><span class="line"> </span><br><span class="line"> 2019-04-08T22:59:59.121+0800: 45225.309: [GC pause (G1 Evacuation Pause) (mixed) 45225.309: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 2204, predicted base time: 18.27 ms, remaining time: 31.73 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45225.309: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 45 regions, survivors: 31 regions, predicted young region time: 0.76 ms]</span><br><span class="line"> 45225.309: [G1Ergonomics (CSet Construction) finish adding old regions to CSet, reason: reclaimable percentage not over threshold, old: 24 regions, max: 154 regions, reclaimable: 80229208 bytes (4.98 %), threshold: 5.00 %]</span><br><span class="line"> 45225.309: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 45 regions, survivors: 31 regions, old: 24 regions, predicted pause time: 22.66 ms, target pause time: 50.00 ms]</span><br><span class="line"> 45225.348: [G1Ergonomics (Mixed GCs) do not continue mixed GCs, reason: reclaimable percentage not over threshold, candidate old regions: 163 regions, reclaimable: 80229208 bytes (4.98 %), threshold: 5.00 %]</span><br><span class="line">, 0.0391519 secs]</span><br><span class="line">   [Parallel Time: 25.0 ms, GC Workers: 8]</span><br><span class="line">      [GC Worker Start (ms): Min: 45225309.4, Avg: 45225309.6, Max: 45225309.7, Diff: 0.3]</span><br><span class="line">      [Ext Root Scanning (ms): Min: 3.9, Avg: 4.4, Max: 5.2, Diff: 1.2, Sum: 35.3]</span><br><span class="line">      [Update RS (ms): Min: 0.0, Avg: 0.6, Max: 0.9, Diff: 0.9, Sum: 4.8]</span><br><span class="line">         [Processed Buffers: Min: 0, Avg: 5.4, Max: 19, Diff: 19, Sum: 43]</span><br><span class="line">      [Scan RS (ms): Min: 0.6, Avg: 0.9, Max: 1.0, Diff: 0.4, Sum: 7.1]</span><br><span class="line">      [Code Root Scanning (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.1, Sum: 0.3]</span><br><span class="line">      [Object Copy (ms): Min: 18.4, Avg: 18.5, Max: 18.8, Diff: 0.5, Sum: 148.4]</span><br><span class="line">      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.1]</span><br><span class="line">         [Termination Attempts: Min: 1, Avg: 1.6, Max: 3, Diff: 2, Sum: 13]</span><br><span class="line">      [GC Worker Other (ms): Min: 0.0, Avg: 0.0, Max: 0.1, Diff: 0.0, Sum: 0.3]</span><br><span class="line">      [GC Worker Total (ms): Min: 24.4, Avg: 24.5, Max: 24.7, Diff: 0.3, Sum: 196.2]</span><br><span class="line">      [GC Worker End (ms): Min: 45225334.1, Avg: 45225334.1, Max: 45225334.1, Diff: 0.0]</span><br><span class="line">   [Code Root Fixup: 0.3 ms]</span><br><span class="line">   [Code Root Purge: 0.0 ms]</span><br><span class="line">   [Clear CT: 0.9 ms]</span><br><span class="line">   [Other: 13.0 ms]</span><br><span class="line">      [Choose CSet: 0.1 ms]</span><br><span class="line">      [Ref Proc: 9.8 ms]</span><br><span class="line">      [Ref Enq: 0.6 ms]</span><br><span class="line">      [Redirty Cards: 0.7 ms]</span><br><span class="line">      [Humongous Register: 0.1 ms]</span><br><span class="line">      [Humongous Reclaim: 0.7 ms]</span><br><span class="line">      [Free CSet: 0.3 ms]</span><br><span class="line">   [Eden: 45.0M(45.0M)-&gt;0.0B(685.0M) Survivors: 31.0M-&gt;6144.0K Heap: 732.5M(1536.0M)-&gt;342.3M(1536.0M)]</span><br><span class="line"> [Times: user=0.17 sys=0.01, real=0.04 secs]</span><br></pre></td></tr></table></figure></p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/08/谈一谈锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2189,6 +2013,182 @@
 
 
     
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/09/10/jdk8-dump异常/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/09/10/jdk8-dump异常/" class="post-title-link" itemprop="url">jdk8-dump异常</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-09-10 10:36:00" itemprop="dateCreated datePublished" datetime="2018-09-10T10:36:00+08:00">2018-09-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/这些年，那些坑/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><img src="\images\pasted-1.png" alt="upload successful"><br>易极付代扣应用疑似存在内存泄漏，因此，尝试进行dump分析，后发现dump一直失败，报错如上，dump命令为：<br> jmap -F -dump:format=b,file=盘符:/XXX.hprof <pid></pid></p>
+<p>原因分析：<br><a href="https://bugs.java.com/view_bug.do?bug_id=8044416" target="_blank" rel="noopener">https://bugs.java.com/view_bug.do?bug_id=8044416</a></p>
+<p>解决方案：<br>1、jmap -dump:format=b,file=盘符:/XXX.hprof <pid>，同时应用启动时，jvm参数-XX:+StartAttachListener<br>    use flag -XX:+StartAttachListener in target java process and make sure you run jmap within the same user as main java process</pid></p>
+<p>2、升级jdk版本到1.8.0_60以上8u60(Fixed)9b64(Fixed) </p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
   </section>
 
   
@@ -2235,7 +2235,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">42</span>
+                    <span class="site-state-item-count">41</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
