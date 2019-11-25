@@ -39,7 +39,7 @@ table|user|user|6|CREATE TABLE `user` (
 , `created` DATETIME NOT NULL
 , `updated` DATETIME NOT NULL
     7、复制admin用户的相关信息（login，email等），将权限is_admin改为0
-    eg： insert into user values(2,0,'tech','technology@yiji.com','tech','04b19245b07f5fe7bd4f4b0dd3567d97b368470e03f7d42079d40c168288a5c9f976191216ae70b2e2aca6192112d98f1fa9','AGlaA8e8UK',null,null,1,0,0,null,'2019-11-06 07:12:14','2019-11-06 07:12:14',0,null,0);
+    eg： insert into user values(2,0,'tech','technology@XXXX','tech','59acf18b94d7eb0694c61e60ce44c110c7a683ac6a8f09580d626f90f4a242000746579358d77dd9e570e83fa24faa88a8a6','F3FAxVm33R',null,null,1,0,0,null,'2019-11-06 07:12:14','2019-11-06 07:12:14',0,null,0); --此密码为admin
     8、访问ip:3000，使用7设置的用户名和管理员admin的密码登录，此时弹出对话框要求重置密码，进行新账户密码重置，此时该账户没有dashbord查询权限
     9、使用admin管理员登录，
     invite your team
