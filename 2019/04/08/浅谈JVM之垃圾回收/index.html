@@ -1,23 +1,479 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-{% block title %}{{ page.title }} | {{ title }}{% endblock %}
+<link rel="stylesheet" href="/css/main.css">
 
-{% block page_class %}page-post-detail{% endblock %}
 
-{% block content %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"realxc.githut.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="说在前面&amp;emsp;&amp;emsp;本文将从java对象的角度出发，探讨java应用运行过程中“对象”从诞生到消亡的生命历程，结合jvm的相关技术方案简要阐述各个环节的实现细节。需要指出的是，本文旨在阐述清楚“对象”的生命周期，对于jvm（本文基于HotSpot虚拟机）相关技术的深层次原理只会点到为止（能描述清“对象”的生命周期即可），后续将会在其他文章中单独罗列出各个主题进行深入剖析。 概述 jav">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java对象的诞生与消亡">
+<meta property="og:url" content="http://realxc.githut.io/2019/04/08/%E6%B5%85%E8%B0%88JVM%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="说在前面&amp;emsp;&amp;emsp;本文将从java对象的角度出发，探讨java应用运行过程中“对象”从诞生到消亡的生命历程，结合jvm的相关技术方案简要阐述各个环节的实现细节。需要指出的是，本文旨在阐述清楚“对象”的生命周期，对于jvm（本文基于HotSpot虚拟机）相关技术的深层次原理只会点到为止（能描述清“对象”的生命周期即可），后续将会在其他文章中单独罗列出各个主题进行深入剖析。 概述 jav">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-74.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-80.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-82.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-84.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-82.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-85.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-85.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-86.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-87.png">
+<meta property="article:published_time" content="2019-04-08T08:54:00.000Z">
+<meta property="article:modified_time" content="2019-09-30T07:34:10.840Z">
+<meta property="article:author" content="Xiang Chuang">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="java对象">
+<meta property="article:tag" content="内存调优">
+<meta property="article:tag" content="垃圾回收">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-74.png">
+
+<link rel="canonical" href="http://realxc.githut.io/2019/04/08/%E6%B5%85%E8%B0%88JVM%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java对象的诞生与消亡 | 博客园-向闯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">博客园-向闯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2019/04/08/%E6%B5%85%E8%B0%88JVM%E4%B9%8B%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java对象的诞生与消亡
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-08 16:54:00" itemprop="dateCreated datePublished" datetime="2019-04-08T16:54:00+08:00">2019-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%93%E9%A2%98%E7%A0%94%E8%AE%A8/" itemprop="url" rel="index"><span itemprop="name">专题研讨</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="说在前面"><a href="#说在前面" class="headerlink" title="说在前面"></a>说在前面</h2><p>&emsp;&emsp;本文将从java对象的角度出发，探讨java应用运行过程中“对象”从诞生到消亡的生命历程，结合jvm的相关技术方案简要阐述各个环节的实现细节。需要指出的是，本文旨在阐述清楚“对象”的生命周期，对于jvm（本文基于HotSpot虚拟机）相关技术的深层次原理只会点到为止（能描述清“对象”的生命周期即可），后续将会在其他文章中单独罗列出各个主题进行深入剖析。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
+<li><a href="#partI">java内存区域</a></li>
+<li><a href="#partII">java对象</a></li>
+<li><a href="#partIII">垃圾回收</a></li>
+<li><a href="#partIV">内存调优</a></li>
+</ul>
+<hr>
+<h2 id="java内存区域"><a href="#java内存区域" class="headerlink" title="java内存区域"></a>java内存区域</h2><p>&emsp;&emsp;java对象生存的载体-运行时数据区，虚拟机中数据区大致包含如下图所示的几个区域：<br><img src="\images\pasted-74.png" alt="upload successful"><br>1、程序计数器<br>&emsp;&emsp;当前线程所执行的字节码的行号指示器，标识执行到的节点，这是一块较小的内存空间。由于任何时刻，一个处理器（多核处理器中的某一核）只会执行一个线程中的指令，因此，每个线程都有一个独立、私有的程序计数器。此区域（唯一一个）在java虚拟机规范中没有规定任何OOM的情况。<br>2、虚拟机栈<br>&emsp;&emsp;其生命周期与线程相同，方法在执行时都会创建一个栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息，每一个方法的调用就是相应栈帧在虚拟机栈中入栈和出栈的过程。<br>局部变量表：存放编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（指向对象起始地址的引用指针-HotSpot方案、或者指向一个代表对象的句柄或其他与此对象相关的位置）、returnAddress类型（执行一条字节码指令的地址）。其中，除long和double占用2个局部变量空间（Slot）外，其余只占用1个Slot。局部变量表所需内存空间在编译期间完成分配，运行期间不会改变大小，即，进入一个方法时，栈帧中所需分配的局部变量空间是确定的。java虚拟机规范对此区域规定了两类异常情况，1是线程请求的栈深度大于虚拟机所允许的深度时抛出StackOverflowError，2是可动态扩展的虚拟机栈扩展时无法申请到足够的内存时抛出OOM。<br>3、本地方法栈<br>&emsp;&emsp;HotSpot将其与虚拟机栈合二为一。它是为虚拟机所使用到的Native方法服务。它可能抛出的异常与虚拟机栈一致。<br>4、堆<br>&emsp;&emsp;此区域用于存放对象的实例。java虚拟机规范原文：The heap is the runtime data area from which memory for all class instances and arrays is allocated.此区域会抛出OOM异常。由于这个区域存分的是对象实例且是线程共享区域，因此在后续的内容中将以此为核心进行讲述。<br>5、方法区（HotSpot，jdk8之后已由元空间取代）<br>&emsp;&emsp;该区域用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据，为了与java堆区分开来，java虚拟机规范为其命了一个别名Non-Heap。该区域会抛出OOM。<br>6、运行时常量池<br>&emsp;&emsp;方法区的一部分，Clas文件中除了由类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池，用于存放编译期生产的各种字面量和符号引用。除了编译期间会产生常量，java允许运行期间产生常量并存放到运行时常量池中，如String.intern()。该区域是方法区的一部分，因此申请不到内存时也会抛出OOM。<br>7、直接内存<br>&emsp;&emsp;它不属于虚拟机运行时数据区的一部分，但其也可能出现OOM，且使用频繁（如NIO类，引入了基于通道（Channel）与缓冲区（Buffer）的I/O方式，可使用Native函数直接分配堆外内存，然后通过一个存储在java堆中的DirectByteBuffer对象作为这块内存的引用进行操作，这样避免了在java堆与Native堆中来回复制数据从而提升了性能）。该区域使用超过机器内存等限制时会抛出OOM。<br>8、元空间<br>&emsp;&emsp;如示意图中所述，HotSpot在jdk8（含）之后，已经移除了老年代（方法区），转由元空间（metaspace）实现，即本地内存Native Memory。<br>&emsp;&emsp;至于为什么使用本地内存替换永久代，官网有如此描述：This is part of the JRockit and Hotspot convergence effort. JRockit customers do not need to configure the permanent generation (since JRockit does not have a permanent generation) and are accustomed to not configuring the permanent generation.<br>&emsp;&emsp;具体移除细节，官网由如此描述：The proposed implementation will allocate class meta-data in native memory and move interned Strings and class statics to the Java heap.<br>&emsp;&emsp;详细信息参见官网地址<a target="_blank" rel="noopener" href="http://openjdk.java.net/jeps/122">http://openjdk.java.net/jeps/122</a></p>
+<hr>
+<h2 id="java对象"><a href="#java对象" class="headerlink" title="java对象"></a>java对象</h2><p>&emsp;&emsp;前面聊完java对象身存的载体的具体结构，下面我们聊一聊java对象本身的一些事，需要说明的的是，此处是基于HotSpot探讨java对象在堆空间上实例的创建、布局以及访问。<br>1、对象的创建<br>&emsp;&emsp;从语言层面来讲，java对象的创建就是一个new关键字，当应用运行时，虚拟机遇到一条new指令，将进行如下操作：<br>&emsp;&emsp;##检查类的加载：检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已经被加载、解析和初始化。<br>&emsp;&emsp;##分配内存：java堆内存是否规整决定了如何分配内存，规整的内存，采用“指针碰撞”（Bump the Pointer），即从已用内存和空闲内存的指针分界点开始向空闲内存移动与对象大小相等的距离即可；如何内存不规整，则需要维护空闲列表（Free List），分配时从列表中选择足够大的空间划分给对象的实例。java堆是否规整与垃圾采集器是否带有压缩整理功能有关，如使用Serial、ParNew这种带Compact过程的收集器时采用指针碰撞，使用CMS这种基于Mark-Sweep算法的收集器时采用空闲列表。另外一个需要考虑的问题是线程安全，解决这个问题有两种方案，1是采用CAS保证原子性；2是为每个线程在java堆中预先分配一小块，即本地线程分配缓冲（TLAB），只需在分配新的TLAB时进行同步锁定，-XX：+/-UseTLAB。<br>&emsp;&emsp;##初始化为0值：此处不包括对象头，这个操作保证了对象的实例可以不赋初始值即可使用。<br>&emsp;&emsp;##对象头信息设置：对象头中包含如，这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄、锁等信息。<br>&emsp;&emsp;##初始化（执行<init>方法）：一般来说，执行new指令之后会接着执行<init>方法（由字节码中是否跟随invokespecial指令决定），从而，一个真正可以使用的对象诞生。<br>2、对象的内存布局<br>&emsp;&emsp;HotSpot中，对象在内存中存储的布局分为3部分：对象头（Header）、实例数据（Instance Data）以及对齐填充（Padding）。<br>&emsp;&emsp;##对象头：对象头包含两部分，1是用于存储对象自身的运行时数据Mark Work，在32位和64位的虚拟机中分别占32bit、64bit,包含信息如哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向锁线程ID、偏向时间戳等。eg：32位未锁定状态的对象，25bit用于存储对象哈希码、4bit用于存储对象分代年龄、2bit用于存储锁标识位，1bit固定为0；2是类型指针，即对象指向它的类元数据的指针；对于数组来说，对象头还需有一块用于记录数组长度的数据从而确定数组的大小。<br>&emsp;&emsp;##实例数据：HotSpot默认的分配策略为longs/doubles、ints、shorts/chars、bytes/boolean、oops（Oddinary Pointers），相同宽度的字段被分配在一起，父类定义的变量位于子类变量之前（如果CompactFields=true，子类较窄的变量也可能插入到父类变量的空隙中）。<br>&emsp;&emsp;##对齐填充：HotSpot要求对象起始地址必须是8字节的整数倍，对象头正好符合，因此对象实例数据可用对齐填充来补全。<br>3、对象的访问定位<br>&emsp;&emsp;java程序需要通过栈上的reference数据来操作堆上的具体对象。<br>&emsp;&emsp;##使用句柄访问：reference中存储的是对象的句柄地址，句柄中包含了对象实例数据与类型数据各自的具体地址，此方式，java堆划分出特定的内存作为句柄池。对象的定位需要两次指针定位，1次找到句柄、另1次找到具体的对象，好处则在于垃圾回收后，对象并移动，不用更改reference中的地址，只需更改句柄池中对应的地址。<br>&emsp;&emsp;##使用直接指针访问：reference中存储的是对象地址。对象的定位一次就能找到，提升了性能，HotSpot采用此方案。<br>4、对象的存活<br>&emsp;&emsp;前一部分提到，java程序通过栈上的reference数据操作堆上的对象，被操作的对象称之为被引用。对象是否存活与其是否尚被引用有关，那么我们首先来谈一谈引用。<br>&emsp;&emsp;引用可分为强引用（Strong Reference）、软引用（Soft Reference）、弱引用（Weak Reference）、虚引用（Phantom Reference）。<br>&emsp;&emsp;##强引用：类似于赋值语句那种，垃圾回收器不会回收被引用对象<br>&emsp;&emsp;##软引用：jdk提供了SoftReference类实现软引用，指一些有用但并非必须的对象，系统OOM之前会回收此类对象<br>&emsp;&emsp;##弱引用：jdk提供了WeakReference类实现弱引用，下一次GC时回收此类对象<br>&emsp;&emsp;##虚引用：jdk提供了PhantomReference类实现虚引用，也称之为幽灵引用，对象是否存在虚引用对其本身无任何影响，且无法通过虚引用获得一个对象实例，因此，为对象设置一个虚引用的唯一目的是该对象被回收时收到一个系统通知<br>&emsp;&emsp;下面来谈谈判断对象是否存活的两类算法：<br>&emsp;&emsp;引用计数算法：给对象添加一个引用计算器，值为0时代表对象可回收，但，对于循环依赖来说，这似乎是个问题<br>&emsp;&emsp;可达性分析算法：以一系列被称为GC Roots的对象（虚拟机栈即栈帧中本地变量表中引用的对象；方法区中类静态属性引用的对象；方法区中常量引用的对象；本地方法栈中JNI引用的对象）为起点进行搜索，判断对象是否有引用链到达GC Roots，如果没有，代表对象可回收。<br>&emsp;&emsp;需要说明的是，利用可达性分析出不可达的对象，并不一定会立即回收，因为进行标记时会做一次筛选（条件是对象是否有必要执行finalize(),如果对象没有覆盖此方法或此方法被执行过一次，则不必要，否则会把此类对象放入一个F-Queue队列中由虚拟机自建一个低优先级的Finalizer线程去执行，为了避免执行缓慢，其并不会等待执行结果）。  </p>
+<hr>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>&emsp;&emsp;再谈对象创建之内存分配<br>&emsp;&emsp;这是一个及其重要的环节，且，根据垃圾回收机制的不同而有所差别，在聊垃圾回收之前，我想有必要就这点多说几句。<br>&emsp;&emsp;##对象优先分配在Eden区域，即年轻代<br>&emsp;&emsp;##大对象直接分配在老年代，需要说明的是何为大对象，不同收集器定义的不一样，Serial及ParNew收集器采用参数-XX:PretenureSizeThreshold指定，G1则默认为大于区域region大小一半的对象<br>&emsp;&emsp;##长期存活的对象进入老年代，一般默认为熬过15次年轻代回收的对象，该值可以调整，具体参数名根据收集器的约定而定。另外，如果Survivor空间中相同年龄所有对象大小的总和大于Survivor空间的一半，年龄大于等于该年龄的对象直接进入老年代（针对Serial及ParNew）<br>&emsp;&emsp;##空间分配担保：只要老年代的连续空间大于新生代对象总大小或历次晋升的平局大小则进行MinorGC，否则进行Full GC（针对Serial及ParNew）<br>&emsp;&emsp;前面大概聊了一下虚拟机内存区域以及java对象本身的那点事，这是一个java开发者必备的基础知识，因为你不仅仅应该知道Object obj = new Object（），你更应该清楚java对象究竟是如何诞生的，JVM在这里面做了什么，另一方面，你还应该清楚JVM又是如何替我们清理那些不再被引用的对象。<br>&emsp;&emsp;首先，我们来简单聊聊垃圾收集算法：<br>&emsp;&emsp;标记-清除（Mark-Sweep）算法：顾名思义，它包含两步，一是标记需要回收的对象，二是清除被标记的对象。但有两个明显的问题是，标记和清除两个环节效率都不高，其次，直接清除会导致内存碎片，这将导致大对象无法找到足够大小的连续空间来分配，从而提前下一次GC。<br>&emsp;&emsp;复制（Copying）算法：将内存划分为几块，当一块内存用完后，把存活的对象移动至另一块，再把当前块已使用的空间一性清理掉。但这会导致预留的那部分空间分配时不能用。如HotSpot实现为，将内存分为Eden和两个Survivor，Eden：Survivro为8：1，即预留了10%的空间。需要指出的是，如果对象生命周期长，那么预留的空间也许会出现不够用，这时便需要其他内存进行分配担保（Handle Promotion），这里指的是老年代内存。因为需要额外的空间做担保，那么此算法不适合老年代回收。<br>&emsp;&emsp;标记-整理（Mark-Compact）算法：完成标记后，让所有存活的对象向一端移动，然后直接清理掉端边界之外的内存。<br>&emsp;&emsp;最后要说明的是，当前的商业虚拟机采用分代收集，即区分新生代和老年代，根据其不同特点搭配不通的垃圾收集算法，如年轻代使用复制算法，老年代使用标记-清除算法或标记-整理算法。<br>&emsp;&emsp;HotSpot实现垃圾回收简介：<br>&emsp;&emsp;##进行对象可达性分析时，要考虑一致性问题，因为对象的引用随着应用线程的运行不停的变更着，因此需要STW，由于STW对应用线程影响很大，各种垃圾回收器中对此做了通盘的考虑，但即使如CMS这种号称不会STW的收集器也无法避免枚举根节点时的GC停顿。另外，HotSpot设计了基于OopMap的数据结构来记录对象的引用以提升效率。<br>&emsp;&emsp;安全点：为指令生产OopMap需要大量额外的空间，因此，HotSpot设计中并没为每条指令生成OopMap，只是在一些成为安全点的特定位置记录这些信息，即，只有当线程进入到安全点时才能暂停下来开始GC。安全点的选定是有讲究的，不可过多也不可过少，所以基本考虑在长时间执行的部分设置安全点，如方法调用、循环跳转、异常跳转等。对于线程在安全点如何停下来的问题，有两种手段，一是抢先式中断、二是主动式中断。HotSpot选择后者，即，GC设置中断标识，用户线程主动轮询是否需要中断，轮询标志的地方和安全点重合。<br>&emsp;&emsp;安全区域：对于某些暂时未分配到CUP时间的线程，如其处于Sleep或Blocked状态，JVM不可能瞎等其得到CPU时间后跑到安全点，因此提供了安全区域解决该问题。安全区域中，引用关系不会发生变化，线程进去安全区域时会标识自己已进入，离开时，需要判断系统是否已经完成了根节点枚举或者整个GC过程，没有完成时需等待接收可以离开的信号。<br>&emsp;&emsp;接下来我们来聊聊HotSpot定义的垃圾回收器，这是一个重要的话题，也是日常开发中我们最直接面对的课题，先上一个总图（这里代表的是jdk11之前的垃圾回收器，因为在jdk11中，oracle推出了号称很强大很强大的ZGC，支持TB级的内存回收及单次GC暂停时间低于10ms，目前未使用到该版本的jdk，也尚未对此回收器做研究）<br><img src="\images\pasted-80.png" alt="upload successful"><br>&emsp;&emsp;##Serial收集器：单线程收集器，进行垃圾回收时需暂停其他所有线程，直到收集结束。比较老的收集器了，适用于Client模式的应用。采用复制算法<br><img src="\images\pasted-82.png" alt="upload successful"><br>&emsp;&emsp;##ParNew收集器：Serial的多线程版本，默认开启的收集线程数与CPU的数量相同，可通过参数-XX:ParallelGCThreads控制。采用复制算法<br><img src="\images\pasted-84.png" alt="upload successful"><br>&emsp;&emsp;##Serial Old收集器：其可作为Serial、ParNew及Parallel Scavenge的老年代收集器，同时，当CMS收集发生Concurrent Model Failure时，会使用Serail Old进行Full GC。采用标记-整理算法<br><img src="\images\pasted-82.png" alt="upload successful"><br>&emsp;&emsp;##Parallel Scavenge收集器：更加关注吞吐量，即追求最大吞吐量，适用于那些需要大量计算的应用。使用参数-XX:MaxGCPauseMillis控制停顿时间，参数-XX:GCTimeRatio控制吞吐量（如默认99，即1/（1+99）为GC占CPU时间），开关参数-XX:UseAdaptiveSizePolicy打开后即开启了GC自适应调节策略，无需指定年轻代大小、Survivor大小或晋升老年代对象大小。采用复制算法<br><img src="\images\pasted-85.png" alt="upload successful"><br>&emsp;&emsp;##Parallel Old收集器：于jdk1.6开始提供，作为Parallel Scavenge的老年代收集器。采用标记-整理算法<br><img src="\images\pasted-85.png" alt="upload successful"><br>&emsp;&emsp;##CMS收集器：更加关注暂停时间，即追求最短暂停时间。其大概包含4个步骤，初始标记、并发标记、重新标记、并发清除，其中，初始标记主要是标记GC Roots能直接关联到的对象，这是一个很快的过程，需要STW，并发标记根据初始标记结果遍历上述对象所引用的对象，这个过程耗时较长但能与用户线程并行执行，重新标记则是修正并发标记过程中用户线程导致的变动，相对并发标记来说耗时是比较短的，需要STW，最后，并发清除也能与用户线程并行执行。需要指出的是，CMS存在一定的缺点，1是其对CPU资源很敏感，比如其并发阶段是占用了CPU资源（即用户线程占用CPU时间会减少），默认线程数为（CPU数量+3）/4；2是其无法处理浮动垃圾（Floating Garbage），导致会出现Concurrent Mode Failure，从而引起Full GC，引起的原因在于并发清理阶段用户线程的运行会产生新的垃圾需下一次GC才可处理，因此CMS开始回收的阈值为默认92%，避免浮动垃圾导致内存不够用而引起Full GC（这时会临时启用Serial Old回收老年代）；3是其基于标记-清除算法，意味着存在内存碎片，那么碎片过多会导致大对象无法分配而导致Full GC，因此有一个开关参数-XX:UseCMSCompactAtFullCollection控制其在准备Full GC时进行内存整理（这是很耗时的）。采用标记-清除算法<br><img src="\images\pasted-86.png" alt="upload successful"><br>&emsp;&emsp;##G1收集器：在暂停时间于吞吐量中权衡。采用G1回收器意味着java堆内存布局与其他回收器将有很大的不同，其将堆分成多个（默认2048个）大小相等的region区域（1M-32M）。注意，超过区域大小一半的对象被视为巨型对象直接分配在老年代。同时，G1维护了一个优先列表用于标识回收各区域的价值大小，从而做到了可预测停顿。同时为了避免全堆扫描对象引用，G1提供了Remembered Set用以维护对象的引用。G1回收大致包含如下4个步骤，初始标记、并发标记、最终标记及筛选回收，各步骤的大致功能与CMS类似。整体来看采用标记-整理算法，局部（region之间）来看采用了复制算法。<br><img src="\images\pasted-87.png" alt="upload successful"></p>
+<hr>
+<h2 id="内存调优"><a href="#内存调优" class="headerlink" title="内存调优"></a>内存调优</h2><p>&emsp;&emsp;前面已经讲述了对象的诞生与消亡，在实际的工作中，我们日常开发或许并没有过多关注于这些细节，但有一项是我们时常直接接触到的，即，在应用内存使用不正常、应用运行慢时，我们往往会想到是否存在内存使用上的问题，并想办法进行内存调优。内存调优，它没有一个统一的解决方案，只能说其有相同的调优原则，再结合应用的实际情况针对性的优化，因此，要谈内存调优，更好的方式是从案例入手，在案例中阐述问题分析的过程，如何定位到内存上的问题，又如何进行针对性的调优。本博客中有相关案例，可参考<a target="_blank" rel="noopener" href="https://realxc.github.io/tags/JVM/">https://realxc.github.io/tags/JVM/</a><br>&emsp;&emsp;作为本篇文章的结尾，下面简单介绍一下我们常用的ParNew、CMS、G1回收器的常用且重要的参数配置：<br>ParNew：<br>&emsp;&emsp;-XX:SurvivorRatio=8(默认)中年代占比1：8 sur：eden<br>&emsp;&emsp;-XX:PretenureSizeThreshold 直接晋升到老年代的对象大小<br>&emsp;&emsp;-XX:NewRatio=4(默认) 年轻代和老年代比例<br>CMS<br>&emsp;&emsp;-XX:CMSInitiatinOccupancyFraction=92 老年代达到92%时回收<br>&emsp;&emsp;-XX:UseCMSCompactAtFullCollection控制其在准备Full GC时进行内存整理<br>&emsp;&emsp;-XX:UseConcMarkSweepGC<br>G1<br>&emsp;&emsp;-XX:+UseG1GC<br>&emsp;&emsp;-XX:MaxGCPauseMillis=n 单次GC暂停时间，默认200ms<br>&emsp;&emsp;-XX:InitiatingHeapOccupancyPercent=n mix gc触发时间，老年代已使用空间占用整堆内存比例，默认45（很多人理解为整堆已使用空间占整堆比例，这是错误的）<br>&emsp;&emsp;-XX:MaxTenuringThreshold=n 年轻代最大年龄，默认15<br>&emsp;&emsp;-XX:G1ReservePercent=n 预留空间大小，避免空间被使用完而导致Full GC<br>&emsp;&emsp;-XX:G1HeapRegionSize=n 区域大小，1-32（M）<br>&emsp;&emsp;-XX:G1NewSizePercent=5 默认为5，如果要调整，需解锁实验性标志 eg：-XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=75<br>&emsp;&emsp;-XX:G1MaxNewSizePercent=60 默认为60，如果要调整，需解锁实验性标志 eg：-XX:+UnlockExperimentalVMOptions -XX:G1NewSizePercent=10 -XX:G1MaxNewSizePercent=75</p>
+<hr>
+<p>参考参数（jdk8）：<br>(G1): -XX:+UseG1GC -XX:MaxGCPauseMillis=50（自定义） -Xms4096m（自定义） -Xmx4096m（自定义） -XX:MetaspaceSize=128m（自定义） -XX:MaxMetaspaceSize=512m（自定义） -XX:LargePageSizeInBytes=128m（自定义） -XX:+ParallelRefProcEnabled -XX:+PrintAdaptiveSizePolicy -XX:+UseFastAccessorMethods -XX:+TieredCompilation -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000  -verbosegc -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/XXX/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/XXX/oom-XX.hprof</p>
+<hr>
+<p>(CMS):-Xms4096m（自定义） -Xmx4096m（自定义） -XX:MetaspaceSize=128m（自定义） -XX:MaxMetaspaceSize=512m（自定义） -XX:SurvivorRatio=8（自定义） -XX:NewRatio=4（自定义） -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m（自定义） -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70（自定义） -XX:+UseParNewGC -XX:MaxTenuringThreshold=5（自定义） -XX:+CMSClassUnloadingEnabled -XX:+TieredCompilation -XX:+ExplicitGCInvokesConcurrent -XX:AutoBoxCacheMax=20000 -verbosegc -XX:+PrintGCDateStamps -XX:+PrintGCDetails -Xloggc:/XXX/gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/XXX/oom-XX.hprof</p>
+<p><a target="_blank" rel="noopener" href="https://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html">https://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html</a><br><a target="_blank" rel="noopener" href="https://www.oracle.com/technetwork/cn/articles/java/g1gc-1984535-zhs.html#Unlock">https://www.oracle.com/technetwork/cn/articles/java/g1gc-1984535-zhs.html#Unlock</a></p>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+              <a href="/tags/java%E5%AF%B9%E8%B1%A1/" rel="tag"># java对象</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98/" rel="tag"># 内存调优</a>
+              <a href="/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="tag"># 垃圾回收</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/03/07/dubbo-%E5%9F%BA%E4%BA%8Ezookeeper%E7%9A%84%E6%B3%A8%E5%86%8C%E7%BB%93%E6%9E%84/" rel="prev" title="dubbo-基于zookeeper的注册结构">
+      <i class="fa fa-chevron-left"></i> dubbo-基于zookeeper的注册结构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/04/08/%E8%B0%88%E4%B8%80%E8%B0%88%E9%94%81/" rel="next" title="谈一谈锁">
+      谈一谈锁 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%B4%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">说在前面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F"><span class="nav-number">3.</span> <span class="nav-text">java内存区域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java%E5%AF%B9%E8%B1%A1"><span class="nav-number">4.</span> <span class="nav-text">java对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6"><span class="nav-number">5.</span> <span class="nav-text">垃圾回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E8%B0%83%E4%BC%98"><span class="nav-number">6.</span> <span class="nav-text">内存调优</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

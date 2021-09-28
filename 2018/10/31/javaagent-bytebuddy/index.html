@@ -1,23 +1,518 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-{% block title %}{{ page.title }} | {{ title }}{% endblock %}
+<link rel="stylesheet" href="/css/main.css">
 
-{% block page_class %}page-post-detail{% endblock %}
 
-{% block content %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"realxc.githut.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Java agent是在另外一个Java应用（“目标”应用）启动之前要执行的Java程序，这样agent就有机会修改目标应用或者应用所运行的环境。在本文中，我们将会从基础内容开始，逐渐增强其功能，借助字节码操作工具Byte Buddy，使其成为高级的agent实现。 在最基本的用例中，Java agent会用来设置应用属性或者配置特定的环境状态，agent能够作为可重用和可插入的组件。如下的样例描">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javaagent-bytebuddy">
+<meta property="og:url" content="http://realxc.githut.io/2018/10/31/javaagent-bytebuddy/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="Java agent是在另外一个Java应用（“目标”应用）启动之前要执行的Java程序，这样agent就有机会修改目标应用或者应用所运行的环境。在本文中，我们将会从基础内容开始，逐渐增强其功能，借助字节码操作工具Byte Buddy，使其成为高级的agent实现。 在最基本的用例中，Java agent会用来设置应用属性或者配置特定的环境状态，agent能够作为可重用和可插入的组件。如下的样例描">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-54.png">
+<meta property="article:published_time" content="2018-10-31T09:01:00.000Z">
+<meta property="article:modified_time" content="2019-09-30T07:34:10.837Z">
+<meta property="article:author" content="Xiang Chuang">
+<meta property="article:tag" content="javaagent">
+<meta property="article:tag" content="bytebuddy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-54.png">
+
+<link rel="canonical" href="http://realxc.githut.io/2018/10/31/javaagent-bytebuddy/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>javaagent-bytebuddy | 博客园-向闯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">博客园-向闯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/10/31/javaagent-bytebuddy/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          javaagent-bytebuddy
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-31 17:01:00" itemprop="dateCreated datePublished" datetime="2018-10-31T17:01:00+08:00">2018-10-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%A4%96%E9%83%A8%E5%BC%95%E7%94%A8/" itemprop="url" rel="index"><span itemprop="name">外部引用</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Java agent是在另外一个Java应用（“目标”应用）启动之前要执行的Java程序，这样agent就有机会修改目标应用或者应用所运行的环境。在本文中，我们将会从基础内容开始，逐渐增强其功能，借助字节码操作工具Byte Buddy，使其成为高级的agent实现。</p>
+<p>在最基本的用例中，Java agent会用来设置应用属性或者配置特定的环境状态，agent能够作为可重用和可插入的组件。如下的样例描述了这样的一个agent，它设置了一个系统属性，在实际的程序中就可以使用该属性了：</p>
+<p>public class Agent {  public static void premain(String arg) {    System.setProperty(“my-property”, “foo”);  }}</p>
+<p>如上面的代码所述，Java agent的定义与其他的Java程序类似，只不过它使用premain方法替代main方法作为入口点。顾名思义，这个方法能够在目标应用的main方法之前执行。相对于其他的Java程序，编写agent并没有特定的规则。有一个很小的区别在于，Java agent接受一个可选的参数，而不是包含零个或更多参数的数组。</p>
+<p>如果要使用这个agent，必须要将agent类和资源打包到jar中，并且在jar的manifest中要将Agent-Class属性设置为包含premain方法的agent类。（agent必须要打包到jar文件中，它不能通过拆解的格式进行指定。）接下来，我们需要启动应用程序，并且在命令行中通过javaagent参数来引用jar文件的位置：</p>
+<p>java -javaagent:myAgent.jar -jar myProgram.jar</p>
+<p>我们还可以在位置路径上设置可选的agent参数。在下面的命令中会启动一个Java程序并且添加给定的agent，将值myOptions作为参数提供给premain方法：</p>
+<p>java -javaagent:myAgent.jar=myOptions -jar myProgram.jar</p>
+<p>通过重复使用javaagent命令，能够添加多个agent。</p>
+<p>但是，Java agent的功能并不局限于修改应用程序环境的状态，Java agent能够访问Java instrumentation API，这样的话，agent就能修改目标应用程序的代码。Java虚拟机中这个鲜为人知的特性提供了一个强大的工具，有助于实现面向切面的编程。</p>
+<p>如果要对Java程序进行这种修改，我们需要在agent的premain方法上添加类型为Instrumentation的第二个参数。Instrumentation参数可以用来执行一系列的任务，比如确定对象以字节为单位的精确大小以及通过注册ClassFileTransformers实际修改类的实现。ClassFileTransformers注册之后，当类加载器（class loader）加载类的时候都会调用它。当它被调用时，在类文件所代表的类加载之前，类文件transformer有机会改变或完全替换这个类文件。按照这种方式，在类使用之前，我们能够增强或修改类的行为，如下面的样例所示：</p>
+<p>public class Agent { public static void premain(String argument, Instrumentation inst) {   inst.addTransformer(new ClassFileTransformer() {     @Override     public byte[] transform(       ClassLoader loader,       String className,       Class&lt;?&gt; classBeingRedefined, // 如果类之前没有加载的话，值为null       ProtectionDomain protectionDomain,       byte[] classFileBuffer) {       // 返回改变后的类文件。     }   }); }}</p>
+<p>通过使用Instrumentation实例注册上述的ClassFileTransformer之后，每个类加载的时候，都会调用这个transformer。为了实现这一点，transformer会接受一个二进制和类加载器的引用，分别代表了类文件以及试图加载类的类加载器。</p>
+<p>Java agent也可以在Java应用的运行期注册，如果是在这种场景下，instrumentation API允许重新定义已加载的类，这个特性被称之为“HotSwap”。不过，重新定义类仅限于替换方法体。在重新定义类的时候，不能新增或移除类成员，并且类型和签名也不能进行修改。当类第一次加载的时候，并没有这种限制，如果是在这样的场景下，那classBeingRedefined会被设置为null。</p>
+<p>Java字节码与类文件格式</p>
+<p>类文件代表了Java类编译之后的状态。类文件中会包含字节码，这些字节码代表了Java源码中最初的程序指令。Java字节码可以视为Java虚拟机的语言。实际上，JVM并不会将Java视为编程语言，它只能处理字节码。因为它采用二进制的表现形式，所以相对于程序的源码，它占用的空间更少。除此之外，将程序以字节码的形式进行表现能够更容易地编译Java以外的其他语言，如Scala或Clojure，从而让它们运行在JVM上。如果没有字节码作为中间语言的话，那么其他的程序在运行之前，可能还需要将其转换为Java源码。</p>
+<p>但是，在代码处理的时候，这种抽象却带来了一定的成本。如果要将ClassFileTransformer应用到某个类上，那我们不能将该类按照Java源码的形式进行处理，甚至不能假设被转换的代码最初是由Java编写而成的。更糟糕的是，探查类成员或注解的反射API也是禁止使用的，这是因为类加载之前，我们无法访问这些API，而在转换进程完成之前，是无法进行加载的。</p>
+<p>所幸的是，Java字节码相对来讲是一个比较简单的抽象形式，它包含了很少量的操作，稍微花点功夫我们就能大致将其掌握起来。Java虚拟机执行程序的时候，会以基于栈的方式来处理值。字节码指令一般会告知虚拟机，需要从操作数栈（operand stack）上弹出值，执行一些操作，然后再将结果压到栈中。</p>
+<p>让我们考虑一个简单的样例：将数字1和2进行相加操作。JVM首先会将这两个数字压到栈中，这是通过 iconst_1和iconst_2这两个字节指令实现的。iconst_1是个单字节的便捷运算符（operator），它会将数字1压到栈中。与之类似，iconst_2会将数字2压到栈中。然后，会执行iadd指令，它会将栈中最新的两个值弹出，将它们求和计算的结果重新压到栈中。在类文件中，每个指令并不是以其易于记忆的名称进行存储的，而是以一个字节的形式进行存储，这个字节能够唯一地标记特定的指令，这也是bytecode这个术语的来历。上文所述的字节码指令及其对操作数栈的影响，通过下面的图片进行了可视化。</p>
+<p><img src="\images\pasted-54.png" alt="upload successful"></p>
+<p>对于人类用户来讲，会更喜欢源码而不是字节码，不过幸运的是Java社区创建了多个库，能够解析类文件并将紧凑的字节码暴露为具有名称的指令流。例如，流行的ASM库提供了一个简单的visitor API，它能够将类文件剖析为成员和方法指令，其操作方式类似于阅读XML文件时的SAX解析器。如果使用ASM的话，那上述样例中的字节码可以按照如下的代码来进行实现（在这里，ASM方式的指令是visitIns，能够提供修正的方法实现）：</p>
+<p>MethodVisitor methodVisitor = …methodVisitor.visitIns(Opcodes.ICONST_1);methodVisitor.visitIns(Opcodes.ICONST_2);methodVisitor.visitIns(Opcodes.IADD);</p>
+<p>需要注意的是，字节码规范只不过是一种比喻的说法（metaphor），因为Java虚拟机允许将程序转换为优化后的机器码（machine code），只要程序的输出能够保证是正确的即可。因为字节码的简洁性，所以在已有的类中取代和修改指令是很简单直接的。因此，使用ASM及其底层的Java字节码基础就足以实现类转换的Java agent，这需要注册一个ClassFileTransformer，它会使用这个库来处理其参数。</p>
+<p>克服字节码的不足</p>
+<p>对于实际的应用来讲，解析原始的类文件依然意味着有很多的手动工作。Java程序员通常感兴趣的是类型层级结构中的类。例如，某个Java agent可能需要修改所有实现给定接口的类。如果要确定某个类的超类，那只靠解析ClassFileTransformer所给定的类文件就不够了，类文件中只包含了直接超类和接口的名字。为了解析可能的超类型关联关系，程序员依然需要定位这些类型的类文件。</p>
+<p>在项目中直接使用ASM的另外一个困难在于，团队中需要有开发人员学习Java字节码的基础知识。在实践中，这往往会导致很多的开发人员不敢再去修改字节码操作相关的代码。如果这样的话，实现Java agent很容易为项目的长期维护带来风险。</p>
+<p>为了克服这些问题，我们最好使用较高层级的抽象来实现Java agent，而不是直接操作Java字节码。Byte Buddy是开源的、基于Apache 2.0许可证的库，它致力于解决字节码操作和instrumentation API的复杂性。Byte Buddy所声称的目标是将显式的字节码操作隐藏在一个类型安全的领域特定语言背后。通过使用Byte Buddy，任何熟悉Java编程语言的人都有望非常容易地进行字节码操作。</p>
+<p>Byte Buddy简介</p>
+<p>Byte Buddy的目的并不仅仅是为了生成Java agent。它提供了一个API用于生成任意的Java类，基于这个生成类的API，Byte Buddy提供了额外的API来生成Java agent。</p>
+<p>作为Byte Buddy的简介，如下的样例展现了如何生成一个简单的类，这个类是Object的子类，并且重写了toString方法，用来返回“Hello World!”。与原始的ASM类似，“intercept”会告诉Byte Buddy为拦截到的指令提供方法实现：</p>
+<p>Class&lt;?&gt; dynamicType = new ByteBuddy()  .subclass(Object.class)  .method(ElementMatchers.named(“toString”))  .intercept(FixedValue.value(“Hello World!”))  .make()  .load(getClass().getClassLoader(),                  ClassLoadingStrategy.Default.WRAPPER)  .getLoaded();</p>
+<p>从上面的代码中，我们可以看到Byte Buddy要实现一个方法分为两步。首先，编程人员需要指定一个ElementMatcher，它负责识别一个或多个需要实现的方法。Byte Buddy提供了功能丰富的预定义拦截器（interceptor），它们暴露在ElementMatchers类中。在上述的例子中，toString方法完全精确匹配了名称，但是，我们也可以匹配更为复杂的代码结构，如类型或注解。</p>
+<p>当Byte Buddy生成类的时候，它会分析所生成类型的类层级结构。在上述的例子中，Byte Buddy能够确定所生成的类要继承其超类Object的名为toString的方法，指定的匹配器会要求Byte Buddy重写该方法，这是通过随后的 Implementation 实例实现的，在我们的样例中，这个实例也就是FixedValue。</p>
+<p>当创建子类的时候，Byte Buddy始终会拦截（intercept）一个匹配的方法，在生成的类中重写该方法。但是，我们在本文稍后将会看到Byte Buddy还能够重新定义已有的类，而不必通过子类的方式来实现。在这种情况下，Byte Buddy会将已有的代码替换为生成的代码，而将原有的代码复制到另外一个合成的（synthetic）方法中。</p>
+<p>在我们上面的代码样例中，匹配的方法进行了重写，在实现里面，返回了固定的值“Hello World!”。intercept方法接受Implementation类型的参数，Byte Buddy自带了多个预先定义的实现，如上文所使用的FixedValue类。但是，如果需要的话，可以使用前文所述的ASM API将某个方法实现为自定义的字节码，Byte Buddy本身也是基于ASM API实现的。</p>
+<p>定义完类的属性之后，就能通过make方法来进行生成。在样例应用中，因为用户没有指定类名，所以生成的类会给定一个任意的名称。最终，生成的类将会使用ClassLoadingStrategy来进行加载。通过使用上述的默认 WRAPPER策略，类将会使用一个新的类加载器进行加载，这个类加载器会使用环境类加载器作为父加载器。</p>
+<p>类加载之后，使用Java反射API就可以访问它了。如果没有指定其他构造器的话，Byte Buddy将会生成类似于父类的构造器，因此生成的类可以使用默认的构造器。这样，我们就可以检验生成的类重写了 toString方法，如下面的代码所示：</p>
+<p>assertThat(dynamicType.newInstance().toString(),            is(“Hello World!”));</p>
+<p>当然，这个生成的类并没有太大的用处。对于实际的应用来讲，大多数方法的返回值是在运行时计算的，这个计算过程要依赖于方法的参数和对象的状态。</p>
+<p>通过委托实现Instrumentation</p>
+<p>要实现某个方法，有一种更为灵活的方式，那就是使用Byte Buddy的MethodDelegation。通过使用方法委托，在生成重写的实现时，我们就有可能调用给定类和实例的其他方法。按照这种方式，我们可以使用如下的委托器（delegator）重新编写上述的样例：</p>
+<p>class ToStringInterceptor {  static String intercept() {    return “Hello World!”;  }}</p>
+<p>借助上面的POJO拦截器，我们就可以将之前的FixedValue实现替换为MethodDelegation.to(ToStringInterceptor.class)：</p>
+<p>Class&lt;?&gt; dynamicType = new ByteBuddy()  .subclass(Object.class)  .method(ElementMatchers.named(“toString”))  .intercept(MethodDelegation.to(ToStringInterceptor.class))  .make()  .load(getClass().getClassLoader(),                  ClassLoadingStrategy.Default.WRAPPER)  .getLoaded();</p>
+<p>使用上述的委托器，Byte Buddy会在to方法所给定的拦截目标中，确定最优的调用方法。就ToStringInterceptor.class来讲，选择过程只是非常简单地解析这个类型的唯一静态方法而已。在本例中，只会考虑一个静态方法，因为委托的目标中指定的是一个类。与之不同的是，我们还可以将其委托给某个类的实例，如果是这样的话，Byte Buddy将会考虑所有的虚方法（virtual method）。如果类或实例上有多个这样的方法，那么Byte Buddy首先会排除掉所有与指定instrumentation不兼容的方法。在剩余的方法中，库将会选择最佳的匹配者，通常来讲这会是参数最多的方法。我们还可以显式地指定目标方法，这需要缩小合法方法的范围，将ElementMatcher传递到MethodDelegation中，就会进行方法的过滤。例如，通过添加如下的filter，Byte Buddy只会将名为“intercept”的方法视为委托目标：</p>
+<p>MethodDelegation.to(ToStringInterceptor.class)                .filter(ElementMatchers.named(“intercept”))</p>
+<p>执行上面的拦截之后，被拦截到的方法依然会打印出“Hello World!”，但是这次的结果是动态计算的，这样的话，我们就可以在拦截器方法上设置断点，所生成的类每次调用toString时，都会触发拦截器的方法。</p>
+<p>当我们为拦截器方法设置参数时，就能释放出MethodDelegation的全部威力。这里的参数通常是带有注解的，用来要求Byte Buddy在调用拦截器方法时，注入某个特定的值。例如，通过使用@Origin注解，Byte Buddy提供了添加instrument功能的方法的实例，将其作为Java反射API中类的实例：</p>
+<p>class ContextualToStringInterceptor {  static String intercept(@Origin Method m) {    return “Hello World from ” + m.getName() + “!”;  }}</p>
+<p>当拦截toString方法时，对instrument方法的调用将会返回“Hello world from toString!”。</p>
+<p>除了@Origin注解以外，Byte Buddy提供了一组功能丰富的注解。例如，通过在类型为Callable的参数上使用@Super注解，Byte Buddy会创建并注入一个代理实例，它能够调用被instrument方法的原始代码。如果对于特定的用户场景，所提供的注解不能满足需求或者不太适合的话，我们甚至能够注册自定义的注解，让这些注解注入用户特定的值。</p>
+<p>实现方法级别的安全性</p>
+<p>可以看到，我们在运行时可以借助简单的Java代码，使用MethodDelegation来动态重写某个方法。这只是一个简单的样例，但是这项技术可以用到更加实际的应用之中。在本文剩余的内容中，我们将会开发一个样例，它会使用代码生成技术实现一个注解驱动的库，用来限制方法级别的安全性。在我们的第一个迭代中，这个库会通过生成子类的方式来限制安全性。然后，我们将会采取相同的方式来实现Java agent，完成相同的功能。</p>
+<p>样例库会使用如下的注解，允许用户指定某个方法需要考虑安全因素：</p>
+<p>@interface Secured {  String user();}</p>
+<p>例如，假设应用需要使用如下的Service类来执行敏感操作，并且只有用户被认证为管理员才能执行该方法。这是通过为执行这个操作的方法声明Secured注解来指定的：</p>
+<p>class Service {  @Secured(user = “ADMIN”)  void doSensitiveAction() {    // 运行敏感代码…  }}</p>
+<p>我们当然可以将安全检查直接编写到方法中。在实际中，硬编码横切关注点往往会导致复制-粘贴的逻辑，使其难以维护。另外，一旦应用需要涉及额外的需求时，如日志、收集调用指标或结果缓存，直接添加这样的代码扩展性不会很好。通过将这样的功能抽取到agent中，方法就能很纯粹地关注其业务逻辑，使得代码库能够更易于阅读、测试和维护。</p>
+<p>为了让我们规划的库保持尽可能得简单，按照注解的协议声明，如果当前用户不具备注解的用户属性时，将会抛出IllegalStateException异常。通过使用Byte Buddy，这种行为可以用一个简单的拦截器来实现，如下面样例中的SecurityInterceptor所示，它会通过其静态的user域，跟踪当前用户已经进行了登录：</p>
+<p>class SecurityInterceptor {  static String user = “ANONYMOUS”  static void intercept(@Origin Method method) {    if (!method.getAnnotation(Secured.class).user().equals(user)) {      throw new IllegalStateException(“Wrong user”);    }  }}</p>
+<p>通过上面的代码，我们可以看到，即便给定用户授予了访问权限，拦截器也没有调用原始的方法。为了解决这个问题，Byte Buddy有很多预定义的方法可以实现功能的链接。借助MethodDelegation类的andThen方法，上述的安全检查可以放到原始方法的调用之前，如下面的代码所示。如果用户没有进行认证的话，安全检查将会抛出异常并阻止后续的执行，因此原始方法将不会执行。</p>
+<p>将这些功能集合在一起，我们就能生成Service的一个子类，所有带有注解方法的都能恰当地进行安全保护。因为所生成的类是Service的子类，所以它能够替代所有类型为Service的变量，并不需要任何的类型转换，如果没有恰当认证的话，调用doSensitiveAction方法就会抛出异常：</p>
+<p>new ByteBuddy()  .subclass(Service.class)  .method(ElementMatchers.isAnnotatedBy(Secured.class))  .intercept(MethodDelegation.to(SecurityInterceptor.class)                             .andThen(SuperMethodCall.INSTANCE)))  .make()  .load(getClass().getClassLoader(),           ClassLoadingStrategy.Default.WRAPPER)  .getLoaded()  .newInstance()  .doSensitiveAction();</p>
+<p>不过坏消息是，因为实现instrumentation功能的子类是在运行时创建的，所以除了使用Java反射以外，没有其他办法创建这样的实例。因此，所有instrumentation类的实例都应该通过一个工厂来创建，这个工厂会封装创建instrumentation子类的复杂性。这样造成的结果就是，子类instrumentation通常会用于框架之中，这些框架本身就需要通过工厂来创建实例，例如，像依赖管理的框架Spring或对象-关系映射的框架Hibernate，而对于其他类型的应用来讲，子类instrumentation实现起来通常过于复杂。</p>
+<p>实现安全功能的Java agent</p>
+<p>通过使用Java agent，上述安全框架的一个替代实现将会修改Service类的原始字节码，而不是重写它。这样做的话，我们就没有必要创建托管的实例了，只需简单地调用</p>
+<p>new Service().doSensitiveAction()</p>
+<p>即可，如果对应的用户没有进行认证的话，就会抛出异常。为了支持这种方式，Byte Buddy提供一种称之为rebase某个类的理念。当rebase某个类的时候，不会创建子类，所采用的策略是实现instrumentation功能的代码将会合并到被instrument的类中，从而改变其行为。在添加instrumentation功能之后，在被instrument的类中，其所有方法的原始代码均可进行访问，因此像SuperMethodCall这样的instrumentation，工作方式与创建子类是完全一样的。</p>
+<p>创建子类与rebase的行为是非常类似的，所以两种操作的API执行方式是一致的，都会使用相同的DynamicType.Builder接口来描述某个类型。两种形式的instrumentation都可以通过ByteBuddy类来进行访问。为了使Java agent的定义更加便利，Byte Buddy还提供了 AgentBuilder类，它希望能够以一种简洁的方式应对一些通用的用户场景。为了定义Java agent实现方法级别的安全性，将如下的类定义为agent的入口点就足以完成该功能了：</p>
+<p>class SecurityAgent {  public static void premain(String arg, Instrumentation inst) {    new AgentBuilder.Default()    .type(ElementMatchers.any())    .transform((builder, type) -&gt; builder    .method(ElementMatchers.isAnnotatedBy(Secured.class)    .intercept(MethodDelegation.to(SecurityInterceptor.class)               .andThen(SuperMethodCall.INSTANCE))))    .installOn(inst);  }}</p>
+<p>如果将这个agent打包为jar文件并在命令行中进行指定，那么所有带有Secured注解的方法将会进行“转换”或重定义，从而实现安全保护。如果不激活这个Java agent的话，应用在运行时就不包含额外的安全检查。当然，这意味着如果对带有注解的代码进行单元测试的话，这些方法的调用并不需要特殊的搭建过程来模拟安全上下文。Java运行时会忽略掉无法在classpath中找到的注解类型，因此在运行带有注解的方法时，我们甚至完全可以在应用中移除掉安全库。</p>
+<p>另外一项优势在于，Java agent能够很容易地进行叠加。如果在命令行中指定多个Java agent的话，每个agent都有机会对类进行修改，其顺序就是在命令行中所指定的顺序。例如，我们可以采取这种方式将安全、日志以及监控框架联合在一起，而不需要在这些应用间增添任何形式的集成层。因此，使用Java agent实现横切的关注点提供了一种更为模块化的代码编写方式，而不必针对某个管理实例的中心框架来集成所有的代码。</p>
+<p>查看英文原文：Easily Create Java Agents with Byte Buddy</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/javaagent/" rel="tag"># javaagent</a>
+              <a href="/tags/bytebuddy/" rel="tag"># bytebuddy</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/10/zookeeper-%E5%8F%8D%E5%A4%8D%E9%87%8D%E8%BF%9E%E9%97%AE%E9%A2%98/" rel="prev" title="zookeeper-反复重连问题">
+      <i class="fa fa-chevron-left"></i> zookeeper-反复重连问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/11/01/Class%E5%8F%8Ajavaagent%E8%A3%85%E8%BD%BD%E7%AE%80%E8%BF%B0/" rel="next" title="class及javaagent装载简述">
+      class及javaagent装载简述 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

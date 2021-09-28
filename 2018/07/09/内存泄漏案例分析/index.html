@@ -1,23 +1,458 @@
-{% extends '_layout.swig' %}
-{% import '_macro/post.swig' as post_template %}
-{% import '_macro/sidebar.swig' as sidebar_template %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-{% block title %}{{ page.title }} | {{ title }}{% endblock %}
+<link rel="stylesheet" href="/css/main.css">
 
-{% block page_class %}page-post-detail{% endblock %}
 
-{% block content %}
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
 
-  <div id="posts" class="posts-expand">
-    {{ post_template.render(page) }}
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"realxc.githut.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏） 现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉          3、青年代内存频繁回收（该原因是青年代内存分配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存泄漏-案例分析">
+<meta property="og:url" content="http://realxc.githut.io/2018/07/09/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏） 现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉          3、青年代内存频繁回收（该原因是青年代内存分配">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-2.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-3.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-4.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-5.png">
+<meta property="article:published_time" content="2018-07-09T06:24:00.000Z">
+<meta property="article:modified_time" content="2019-09-30T07:34:10.839Z">
+<meta property="article:author" content="Xiang Chuang">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="内存泄漏">
+<meta property="article:tag" content="mat">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-2.png">
+
+<link rel="canonical" href="http://realxc.githut.io/2018/07/09/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>内存泄漏-案例分析 | 博客园-向闯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
   </div>
 
-{% endblock %}
+  <div class="site-meta">
 
-{% block sidebar %}
-  {{ sidebar_template.render(true) }}
-{% endblock %}
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">博客园-向闯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
 
-{% block script_extra %}
-  {% include '_scripts/pages/post-details.swig' %}
-{% endblock %}
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/07/09/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          内存泄漏-案例分析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-09 14:24:00" itemprop="dateCreated datePublished" datetime="2018-07-09T14:24:00+08:00">2018-07-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%99%E4%BA%9B%E5%B9%B4%EF%BC%8C%E9%82%A3%E4%BA%9B%E5%9D%91/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>问题描述：代扣网关启动一段时间后，监控发现系统随着运行时间越长越缓慢（第一时间考虑是否内存泄漏）</p>
+<p>现象：1、一个很简单的代码块执行耗时很长，甚至长达30S以上<br>          2、老年代频繁进行内存回收，但是回收后却仍旧占用了很多内存，且随着时间推移，占用的越来越多，只到系统                       down掉<br>          3、青年代内存频繁回收（该原因是青年代内存分配不合理，可考虑青年代占总堆内存3：8，但是不能太大，如果太                   大，当青年代回收时，如果需要晋升到老年代的对象占内容大于老年代可用空间的一般，将会导致Full GC）</p>
+<p>原因推测：<br>            上述现象第一反应是疑似出现内存泄漏<br>处理过程：1、系统挂掉（重启）前，dump内存镜像文件，  jmap -dump:format=b,file=盘符:/XXX.hprof <pid><br>                 2、使用mat工具分析dump文件<br>                 3、找出引起内存泄漏的对象<br>                 4、分析解决方案</p>
+<p>附：<br>1、执行缓慢的代码日志：下面是一段for循环代码块，每次循环先校验再入库，逻辑简单，但发现异常的慢！<br>2018-07-04 08:39:06.511 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.539 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.596 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.613 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:06.673 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:06.696 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2018-07-04 08:39:39.615 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 代扣请求校验<br>2018-07-04 08:39:39.618 INFO  [DubboServerHandler-172.20.30.60:20939-99] BatchDeductCheckNode-00060000030000000001807040838510002- 插入流水信息到代扣流水表和流水附表<br>2、GC日志：老年代CMS策略垃圾回收日志，反复回收，但依旧回收不了内存，内存消耗的原来越多<br>2018-07-09T14:24:21.701+0800: 337412.009: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4302687K(5183936K)] 4971300K(6106880K), 0.0621324 secs] [Times: user=0.73 sys=0.00, real=0.07 secs]<br>2018-07-09T14:24:21.764+0800: 337412.072: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:22.900+0800: 337413.208: [GC (Allocation Failure) 337413.208: [ParNew: 760830K-&gt;17436K(922944K), 0.0174147 secs] 5063517K-&gt;4320664K(6106880K), 0.0180025 secs] [Times: user=0.11 sys=0.01, real=0.02 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-mark: 3.607/3.760 secs] [Times: user=16.27 sys=0.18, real=3.75 secs]<br>2018-07-09T14:24:25.524+0800: 337415.832: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-preclean: 0.045/0.047 secs] [Times: user=0.07 sys=0.01, real=0.05 secs]<br>2018-07-09T14:24:25.571+0800: 337415.879: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:30.647+0800: 337420.955: [CMS-concurrent-abortable-preclean: 3.287/5.076 secs] [Times: user=4.95 sys=0.24, real=5.08 secs]<br>2018-07-09T14:24:30.658+0800: 337420.966: [GC (CMS Final Remark) [YG occupancy: 617178 K (922944 K)]337420.966: [Rescan (parallel) , 0.0603228 secs]337421.027: [weak refs processing, 0.0000841 secs]337421.027: [class unloading, 0.1254411 secs]337421.152: [scrub symbol table, 0.0445538 secs]337421.197: [scrub string table, 0.0066675 secs][1 CMS-remark: 4303227K(5183936K)] 4920406K(6106880K), 0.2439490 secs] [Times: user=0.90 sys=0.01, real=0.24 secs]<br>2018-07-09T14:24:30.903+0800: 337421.211: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:31.941+0800: 337422.249: [GC (Allocation Failure) 337422.249: [ParNew: 755804K-&gt;24447K(922944K), 0.0350291 secs] 5059025K-&gt;4328220K(6106880K), 0.0357587 secs] [Times: user=0.18 sys=0.00, real=0.04 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-sweep: 2.815/2.958 secs] [Times: user=4.72 sys=0.24, real=2.96 secs]<br>2018-07-09T14:24:33.862+0800: 337424.170: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:33.877+0800: 337424.185: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.886+0800: 337426.194: [GC (CMS Initial Mark) [1 CMS-initial-mark: 4303632K(5183936K)] 4520863K(6106880K), 0.0222239 secs] [Times: user=0.21 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:35.910+0800: 337426.218: [CMS-concurrent-mark-start]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-mark: 3.449/3.463 secs] [Times: user=14.73 sys=0.10, real=3.46 secs]<br>2018-07-09T14:24:39.373+0800: 337429.681: [CMS-concurrent-preclean-start]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-preclean: 0.023/0.023 secs] [Times: user=0.02 sys=0.00, real=0.02 secs]<br>2018-07-09T14:24:39.396+0800: 337429.704: [CMS-concurrent-abortable-preclean-start]<br> CMS: abort preclean due to time 2018-07-09T14:24:44.405+0800: 337434.713: [CMS-concurrent-abortable-preclean: 3.247/5.009 secs] [Times: user=3.97 sys=0.16, real=5.01 secs]<br>2018-07-09T14:24:44.415+0800: 337434.723: [GC (CMS Final Remark) [YG occupancy: 553150 K (922944 K)]337434.723: [Rescan (parallel) , 0.0524846 secs]337434.776: [weak refs processing, 0.0000721 secs]337434.776: [class unloading, 0.1203949 secs]337434.896: [scrub symbol table, 0.0454455 secs]337434.942: [scrub string table, 0.0063738 secs][1 CMS-remark: 4303632K(5183936K)] 4856783K(6106880K), 0.2322675 secs] [Times: user=0.83 sys=0.00, real=0.23 secs]<br>2018-07-09T14:24:44.648+0800: 337434.956: [CMS-concurrent-sweep-start]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-sweep: 2.492/2.501 secs] [Times: user=2.85 sys=0.03, real=2.50 secs]<br>2018-07-09T14:24:47.150+0800: 337437.458: [CMS-concurrent-reset-start]<br>2018-07-09T14:24:47.165+0800: 337437.473: [CMS-concurrent-reset: 0.015/0.015 secs] [Times: user=0.01 sys=0.00, real=0.01 secs]<br>3、mat分析情况：</p>
+<p><img src="\images\pasted-2.png" alt="upload successful"></p>
+<p><img src="\images\pasted-3.png" alt="upload successful"></p>
+<p><img src="\images\pasted-4.png" alt="upload successful"></p>
+<p><img src="\images\pasted-5.png" alt="upload successful"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" rel="tag"># 内存泄漏</a>
+              <a href="/tags/mat/" rel="tag"># mat</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/06/28/dubbo-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E9%97%AE%E9%A2%98/" rel="prev" title="dubbo-反序列化问题">
+      <i class="fa fa-chevron-left"></i> dubbo-反序列化问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/12/druid-filter/" rel="next" title="druid-filter">
+      druid-filter <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
