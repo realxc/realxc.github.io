@@ -77,7 +77,8 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 ## theme: landscape
-theme: next7.8.0
+theme: next
+##theme: ayer
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -85,3 +86,10 @@ deploy:
   type: git
   repo: https://github.com/realxc/realxc.github.io.git
   branch: master
+
+symbols_count_time:
+  symbols: true
+  time: true
+  total_symbols: true
+  total_time: true
+  exclude_codeblock: false

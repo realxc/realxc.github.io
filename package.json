@@ -20,6 +20,8 @@
     "hexo-renderer-marked": "^0.3.2",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^0.2.2",
+    "hexo-symbols-count-time": "^0.7.1",
+    "hexo-theme-ayer": "^1.9.5",
     "hexo-util": "^2.5.0"
   }
 }
