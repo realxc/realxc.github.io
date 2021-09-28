@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"realxc.githut.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="关于java对象的使用，java编码的一个基本能力，但事实上，业务开发中，往往会有疏忽，下面从易极付支付引擎一个bug再次剖析java对象的使用。 业务场景：支付引擎转账-定时任务批量加载挂起的数据执行转账并异步回执                1、批量查询挂起的转账数据，list                2、循环遍历list执行转换并回执                    2.1、将">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java-对象使用问题案例">
+<meta property="og:url" content="http://realxc.githut.io/2018/08/06/java-%E5%AF%B9%E8%B1%A1%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B/index.html">
+<meta property="og:site_name" content="博客园-向闯">
+<meta property="og:description" content="关于java对象的使用，java编码的一个基本能力，但事实上，业务开发中，往往会有疏忽，下面从易极付支付引擎一个bug再次剖析java对象的使用。 业务场景：支付引擎转账-定时任务批量加载挂起的数据执行转账并异步回执                1、批量查询挂起的转账数据，list                2、循环遍历list执行转换并回执                    2.1、将">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-24.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-25.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-26.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-27.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-28.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-30.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-31.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-32.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-33.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-34.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-35.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-36.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-37.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-38.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-39.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-40.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-41.png">
+<meta property="og:image" content="http://realxc.githut.io/images/pasted-42.png">
+<meta property="article:published_time" content="2018-08-06T09:23:00.000Z">
+<meta property="article:modified_time" content="2019-09-30T07:34:10.837Z">
+<meta property="article:author" content="Xiang Chuang">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="java对象">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://realxc.githut.io/images/pasted-24.png">
+
+<link rel="canonical" href="http://realxc.githut.io/2018/08/06/java-%E5%AF%B9%E8%B1%A1%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>java-对象使用问题案例 | 博客园-向闯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">博客园-向闯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://realxc.githut.io/2018/08/06/java-%E5%AF%B9%E8%B1%A1%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98%E6%A1%88%E4%BE%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Xiang Chuang">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="博客园-向闯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java-对象使用问题案例
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-06 17:23:00" itemprop="dateCreated datePublished" datetime="2018-08-06T17:23:00+08:00">2018-08-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-09-30 15:34:10" itemprop="dateModified" datetime="2019-09-30T15:34:10+08:00">2019-09-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BF%99%E4%BA%9B%E5%B9%B4%EF%BC%8C%E9%82%A3%E4%BA%9B%E5%9D%91/" itemprop="url" rel="index"><span itemprop="name">这些年，那些坑</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关于java对象的使用，java编码的一个基本能力，但事实上，业务开发中，往往会有疏忽，下面从易极付支付引擎一个bug再次剖析java对象的使用。</p>
+<p>业务场景：支付引擎转账-定时任务批量加载挂起的数据执行转账并异步回执<br>                1、批量查询挂起的转账数据，list<br>                2、循环遍历list执行转换并回执<br>                    2.1、将数据转换到业务上下文中<br>                    2.2、执行转账（数据从业务上下文中获取）<br>                    2.3、发布转账回执事件（数据从业务上下文中获取）<br>                 3、在新线程中异步回执（订阅到2.3发布的回执事件后与2并行执行）</p>
+<p>上述是简化后的业务流程，下面加以核心代码说明支付引擎的实现逻辑<br>                1、批量查询挂起的转账数据，list </p>
+<p><img src="\images\pasted-24.png" alt="upload successful"></p>
+<p><img src="\images\pasted-25.png" alt="upload successful"><br> 2、循环遍历list执行转换并回执<br>     2.1、将数据转换到业务上下文中</p>
+<p><img src="\images\pasted-26.png" alt="upload successful"></p>
+<p><img src="\images\pasted-27.png" alt="upload successful"></p>
+<p><img src="\images\pasted-28.png" alt="upload successful"><br>这儿调用的是易极付common-util中提供的对象转换方法，源码如下：</p>
+<p><img src="\images\pasted-30.png" alt="upload successful"></p>
+<p><img src="\images\pasted-31.png" alt="upload successful"></p>
+<p> 2.2、执行转账（数据从业务上下文中获取）<br><img src="\images\pasted-32.png" alt="upload successful"></p>
+<p>2.3、发布转账回执事件（数据从业务上下文中获取）<br><img src="\images\pasted-33.png" alt="upload successful"></p>
+<p><img src="\images\pasted-34.png" alt="upload successful"></p>
+<p><img src="\images\pasted-35.png" alt="upload successful"></p>
+<p><img src="\images\pasted-36.png" alt="upload successful"></p>
+<p><img src="\images\pasted-37.png" alt="upload successful"></p>
+<p>3、在新线程中异步回执（订阅到2.3发布的回执事件后与2并行执行）<br><img src="\images\pasted-38.png" alt="upload successful"></p>
+<p>上述逻辑，经过实际测试，存在严重问题，问题如下：<br>异步回执时，拿到的数据并不是实际预期的数据，而被篡改了，可以看见的是，执行异步回执时，拿到了list循环遍历后续的数据。</p>
+<p>分析问题，很明显，我们看到了2.1这么一行代码：<br><img src="\images\pasted-39.png" alt="upload successful"><br>那么，当前2.2转账完成后，发出2.3异步回执事件，3执行回执是异步的（并行的），此时下一次循环完全可能已经再次执行了2.1这行代码，那么就有问题！！！  为什么？</p>
+<p>上述判断只是初次分析，但经过进一步分析，我们发现其实3中的数据已经在2.3中将数据封装好，3只是从封装好的数据中取出相应的数据而已，2.3是同步执行过程，那么，下一次2.1执行时，一定是在上一次2.3执行完成之后！</p>
+<p>但是，经测试，这儿确实是有问题的，<br>于是，再次分析：<br>2.1进行数据转换时，通过源码分析，我们得出，此处只是将数据的值一个一个的set到业务上下文的数据对象中，那么意味着什么？  业务上下午serviceContext是一个全局对象，进入执行逻辑前已经初始化完成，那么，其内存已经开辟完成，意味着该对象中数据对象的内存也已开辟完成。那么，set值只是为那一块内存进行了赋值操作<br>2.3通过getEntityObject将数据赋给新的对象I，那么，此时I和业务上下午中的数据对象都是指向同一块内存区域<br>3/2.1 此时3和下一个2.1并行执行，3中获取数据对象的值，而1.2给上下文数据对象赋予新的值， 那么，3是从这块内存区域取值，1.2是给这块内存区域赋值，一旦1.2执行在前，那么3拿到的当然是重新赋予的值。</p>
+<p>通过上述分析，我们知道了问题根源，那么，如何改造？<br>很简单<br>修改2.1的代码为<br><img src="\images\pasted-40.png" alt="upload successful"></p>
+<p><img src="\images\pasted-41.png" alt="upload successful"><br>很显然，同样是给业务上下午数据对象赋值，与上面的方案区别在于，此处是将上下午数据对象指向的新的内存地址。<br>那么执行2.3时，通过getEntityObject将数据赋给新的对象I，其所指向的内存地址也是这块新的地址<br>执行3/2.1时，3依旧从这块内存地址取值，而2.1则是将上下午数据对象指向另一块内存地址，毫不冲突，更谈不上数据篡改。</p>
+<p>下面图示的方式给与说明：<br><img src="\images\pasted-42.png" alt="upload successful"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/java%E5%AF%B9%E8%B1%A1/" rel="tag"># java对象</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/30/%E6%95%B0%E6%8D%AE%E5%BA%93-kill%E6%9C%8D%E5%8A%A1%E8%BF%9B%E7%A8%8B%E5%BC%95%E5%8F%91%E7%9A%84%E8%A1%80%E6%A1%88/" rel="prev" title="数据库-kill服务进程引发的血案">
+      <i class="fa fa-chevron-left"></i> 数据库-kill服务进程引发的血案
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/09/10/jdk8-dump%E5%BC%82%E5%B8%B8/" rel="next" title="jdk8-dump异常">
+      jdk8-dump异常 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Xiang Chuang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">44</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xiang Chuang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
